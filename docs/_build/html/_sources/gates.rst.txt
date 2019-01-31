@@ -1,0 +1,31 @@
+.. automodule:: core.layer.gates
+
+Gate
+----
+
+.. autoclass:: Gate
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Linearity
+---------
+
+.. autoclass:: Linear
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Nonlinearities
+--------------
+
+.. autoclass:: Nonlinear
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. autoclass:: ReLU
+    :members:
+    :undoc-members:
+    :show-inheritance:

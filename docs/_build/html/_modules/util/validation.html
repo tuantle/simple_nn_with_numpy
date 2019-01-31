@@ -1,0 +1,673 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>util.validation &mdash; Prototype 0.1.0.beta documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Prototype
+          
+
+          
+            
+            <img src="../../_static/logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/model/nn/feed_forward.html">Feed Forward</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Prototype</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>util.validation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for util.validation</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2016-present Tuan Le.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the MIT License.</span>
+<span class="c1"># You may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.html</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="c1">#</span>
+<span class="c1"># ------------------------------------------------------------------------</span>
+<span class="c1">#</span>
+<span class="c1"># Author Tuan Le (tuan.t.lei@gmail.com)</span>
+<span class="c1">#</span>
+<span class="c1"># ------------------------------------------------------------------------</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+
+<span class="c1"># ------------------------------------------------------------------------</span>
+
+
+<span class="k">class</span> <span class="nc">Validator</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Description - A metaclass for validator class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__setattr__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot set value to a validator class.&#39;</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">OneOfType</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">Validator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Description - Checker if arg is one of type in list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">            args -</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">args</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_arg_types</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;OneOfType argument type list is empty.&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">arg_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description -</span>
+<span class="sd">        Returns:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arg_types</span>
+
+    <span class="k">def</span> <span class="nf">is_matched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description -</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">        Returns:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">matched</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">arg_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arg_types</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">arg_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">matched</span> <span class="o">=</span> <span class="n">arg</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="k">elif</span> <span class="n">arg_type</span> <span class="o">==</span> <span class="n">callable</span><span class="p">:</span>
+                <span class="n">matched</span> <span class="o">=</span> <span class="n">callable</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg_type</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg_type</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg_type</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">),</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">),</span> <span class="n">arg_type</span><span class="p">):</span>
+                    <span class="n">matched</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">),</span> <span class="n">arg_type</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">matched</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">arg_type</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg_type</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                    <span class="n">inner_matched</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">for</span> <span class="n">inner_arg</span> <span class="ow">in</span> <span class="n">arg</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">inner_arg_type</span> <span class="ow">in</span> <span class="n">arg_type</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_arg_type</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">),</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">),</span> <span class="n">inner_arg_type</span><span class="p">):</span>
+                                <span class="n">inner_matched</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">),</span> <span class="n">inner_arg_type</span><span class="p">)</span>
+                            <span class="k">elif</span> <span class="n">inner_arg_type</span> <span class="o">==</span> <span class="n">callable</span><span class="p">:</span>
+                                <span class="n">inner_matched</span> <span class="o">=</span> <span class="n">callable</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">)</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">inner_matched</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">,</span> <span class="n">inner_arg_type</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="ow">not</span> <span class="n">inner_matched</span><span class="p">:</span>
+                                <span class="k">break</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">inner_matched</span><span class="p">:</span>
+                            <span class="k">break</span>
+                    <span class="n">matched</span> <span class="o">=</span> <span class="n">inner_matched</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg_type</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">inner_matched</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">for</span> <span class="n">inner_arg</span> <span class="ow">in</span> <span class="n">arg</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">inner_arg_type</span> <span class="ow">in</span> <span class="n">arg_type</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_arg_type</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">),</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">),</span> <span class="n">inner_arg_type</span><span class="p">):</span>
+                                <span class="n">inner_matched</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">),</span> <span class="n">inner_arg_type</span><span class="p">)</span>
+                            <span class="k">elif</span> <span class="n">inner_arg_type</span> <span class="o">==</span> <span class="n">callable</span><span class="p">:</span>
+                                <span class="n">inner_matched</span> <span class="o">=</span> <span class="n">callable</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">)</span>
+                            <span class="k">elif</span> <span class="n">inner_arg_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                                <span class="n">inner_matched</span> <span class="o">=</span> <span class="n">inner_arg</span> <span class="o">==</span> <span class="n">inner_arg_type</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">inner_matched</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">,</span> <span class="n">inner_arg_type</span><span class="p">)</span>
+                    <span class="n">matched</span> <span class="o">=</span> <span class="n">inner_matched</span>
+            <span class="k">if</span> <span class="n">matched</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="k">return</span> <span class="n">matched</span>
+
+
+<span class="k">class</span> <span class="nc">FType</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">Validator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Description - Validate input argument types for functions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">            args -</span>
+<span class="sd">            kwarg -</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_arg_types</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kwarg_types</span> <span class="o">=</span> <span class="n">kwargs</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">decorated_method</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description -</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Description -</span>
+<span class="sd">            Arguments:</span>
+<span class="sd">            Returns:</span>
+<span class="sd">                decorator</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">args_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+            <span class="n">kwargs_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">arg_types_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_arg_types</span><span class="p">)</span>
+            <span class="n">kwarg_types_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_kwarg_types</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">arg_types_len</span> <span class="o">+</span> <span class="n">kwarg_types_len</span><span class="p">)</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">args_len</span> <span class="o">+</span> <span class="n">kwargs_len</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s1">&#39;Mismatched number of arguments and argument validation types. Expecting </span><span class="si">{len1}</span><span class="s1"> or less, but recevied </span><span class="si">{len2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">len1</span><span class="o">=</span><span class="n">arg_types_len</span><span class="p">,</span>
+                        <span class="n">len2</span><span class="o">=</span><span class="n">args_len</span> <span class="o">+</span> <span class="n">kwargs_len</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">args_len</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">arg_type</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arg_types</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg_type</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="n">arg</span><span class="p">))</span>
+                        <span class="k">for</span> <span class="n">inner_arg</span> <span class="ow">in</span> <span class="n">arg</span><span class="p">:</span>
+                            <span class="k">for</span> <span class="n">inner_arg_type</span> <span class="ow">in</span> <span class="n">arg_type</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_arg_type</span><span class="p">,</span> <span class="n">OneOfType</span><span class="p">):</span>
+                                    <span class="n">oneOfType</span> <span class="o">=</span> <span class="n">inner_arg_type</span>
+                                    <span class="k">if</span> <span class="ow">not</span> <span class="n">oneOfType</span><span class="o">.</span><span class="n">is_matched</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">):</span>
+                                        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting one of </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">oneOfType</span><span class="o">.</span><span class="n">arg_types</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">)))</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_arg_type</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">),</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">),</span> <span class="n">inner_arg_type</span><span class="p">):</span>
+                                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">),</span> <span class="n">inner_arg_type</span><span class="p">):</span>
+                                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">inner_arg_type</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">)))</span>
+                                    <span class="k">elif</span> <span class="n">inner_arg_type</span> <span class="o">==</span> <span class="n">callable</span><span class="p">:</span>
+                                        <span class="k">if</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">):</span>
+                                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting function or method, but recevied </span><span class="si">{type}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">)))</span>
+                                    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">,</span> <span class="n">inner_arg_type</span><span class="p">):</span>
+                                        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting one of </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">inner_arg_type</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="n">inner_arg</span><span class="p">))</span>
+                    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg_type</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="n">arg</span><span class="p">))</span>
+                        <span class="k">for</span> <span class="n">inner_arg</span> <span class="ow">in</span> <span class="n">arg</span><span class="p">:</span>
+                            <span class="k">for</span> <span class="n">inner_arg_type</span> <span class="ow">in</span> <span class="n">arg_type</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_arg_type</span><span class="p">,</span> <span class="n">OneOfType</span><span class="p">):</span>
+                                    <span class="n">oneOfType</span> <span class="o">=</span> <span class="n">inner_arg_type</span>
+                                    <span class="k">if</span> <span class="ow">not</span> <span class="n">oneOfType</span><span class="o">.</span><span class="n">is_matched</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">):</span>
+                                        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting one of </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">oneOfType</span><span class="o">.</span><span class="n">arg_types</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">)))</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_arg_type</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">),</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">),</span> <span class="n">inner_arg_type</span><span class="p">):</span>
+                                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">),</span> <span class="n">inner_arg_type</span><span class="p">):</span>
+                                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">inner_arg_type</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">)))</span>
+                                    <span class="k">elif</span> <span class="n">inner_arg_type</span> <span class="o">==</span> <span class="n">callable</span><span class="p">:</span>
+                                        <span class="k">if</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">):</span>
+                                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting function or method, but recevied </span><span class="si">{type}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="n">inner_arg</span><span class="p">)))</span>
+                                    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">,</span> <span class="n">inner_arg_type</span><span class="p">):</span>
+                                        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting one of </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">inner_arg_type</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="n">inner_arg</span><span class="p">))</span>
+                    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg_type</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">),</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">),</span> <span class="n">arg_type</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">),</span> <span class="n">arg_type</span><span class="p">):</span>
+                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">arg_type</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)))</span>
+                    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg_type</span><span class="p">,</span> <span class="n">OneOfType</span><span class="p">):</span>
+                        <span class="n">oneOfType</span> <span class="o">=</span> <span class="n">arg_type</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">oneOfType</span><span class="o">.</span><span class="n">is_matched</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting one of </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">oneOfType</span><span class="o">.</span><span class="n">arg_types</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)))</span>
+                    <span class="k">elif</span> <span class="n">arg_type</span> <span class="o">==</span> <span class="n">callable</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting function or method, but recevied </span><span class="si">{type}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="n">arg</span><span class="p">)))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">arg_type</span><span class="p">):</span>
+                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">arg_type</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)))</span>
+            <span class="k">if</span> <span class="n">kwargs_len</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">kwarg_key</span><span class="p">,</span> <span class="n">kwarg</span><span class="p">)</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">kwarg_key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kwarg_types</span><span class="p">:</span>
+                        <span class="n">kwarg_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kwarg_types</span><span class="p">[</span><span class="n">kwarg_key</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwarg_type</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwarg</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="n">kwarg</span><span class="p">))</span>
+                            <span class="k">for</span> <span class="n">inner_kwarg</span> <span class="ow">in</span> <span class="n">kwarg</span><span class="p">:</span>
+                                <span class="k">for</span> <span class="n">inner_kwarg_type</span> <span class="ow">in</span> <span class="n">kwarg_type</span><span class="p">:</span>
+                                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_kwarg_type</span><span class="p">,</span> <span class="n">OneOfType</span><span class="p">):</span>
+                                        <span class="n">oneOfType</span> <span class="o">=</span> <span class="n">inner_kwarg_type</span>
+                                        <span class="k">if</span> <span class="ow">not</span> <span class="n">oneOfType</span><span class="o">.</span><span class="n">is_matched</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">):</span>
+                                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting one of </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">oneOfType</span><span class="o">.</span><span class="n">arg_types</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">)))</span>
+                                    <span class="k">else</span><span class="p">:</span>
+                                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_kwarg_type</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">),</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">),</span> <span class="n">inner_kwarg_type</span><span class="p">):</span>
+                                            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">),</span> <span class="n">inner_kwarg_type</span><span class="p">):</span>
+                                                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">inner_kwarg</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">)))</span>
+                                        <span class="k">elif</span> <span class="n">inner_kwarg_type</span> <span class="o">==</span> <span class="n">callable</span><span class="p">:</span>
+                                            <span class="k">if</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">):</span>
+                                                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting function or method, but recevied </span><span class="si">{type}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="n">inner_kwarg</span><span class="p">)))</span>
+                                        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">,</span> <span class="n">inner_kwarg_type</span><span class="p">):</span>
+                                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting one of </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">inner_kwarg_type</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="n">inner_kwarg</span><span class="p">))</span>
+                        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwarg_type</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwarg</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="n">kwarg</span><span class="p">))</span>
+                            <span class="k">for</span> <span class="n">inner_kwarg</span> <span class="ow">in</span> <span class="n">kwarg</span><span class="p">:</span>
+                                <span class="k">for</span> <span class="n">inner_kwarg_type</span> <span class="ow">in</span> <span class="n">kwarg_type</span><span class="p">:</span>
+                                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_kwarg_type</span><span class="p">,</span> <span class="n">OneOfType</span><span class="p">):</span>
+                                        <span class="n">oneOfType</span> <span class="o">=</span> <span class="n">inner_kwarg_type</span>
+                                        <span class="k">if</span> <span class="ow">not</span> <span class="n">oneOfType</span><span class="o">.</span><span class="n">is_matched</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">):</span>
+                                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting one of </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">oneOfType</span><span class="o">.</span><span class="n">arg_types</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">)))</span>
+                                    <span class="k">else</span><span class="p">:</span>
+                                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_kwarg_type</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">),</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">),</span> <span class="n">inner_kwarg_type</span><span class="p">):</span>
+                                            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">),</span> <span class="n">inner_kwarg_type</span><span class="p">):</span>
+                                                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">inner_kwarg</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">)))</span>
+                                        <span class="k">elif</span> <span class="n">inner_kwarg_type</span> <span class="o">==</span> <span class="n">callable</span><span class="p">:</span>
+                                            <span class="k">if</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">):</span>
+                                                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting function or method, but recevied </span><span class="si">{type}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="n">inner_kwarg</span><span class="p">)))</span>
+                                        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">,</span> <span class="n">inner_kwarg_type</span><span class="p">):</span>
+                                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting one of </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">inner_kwarg_type</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="n">inner_kwarg</span><span class="p">))</span>
+                        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwarg_type</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">kwarg</span><span class="p">),</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">kwarg</span><span class="p">),</span> <span class="n">kwarg_type</span><span class="p">):</span>
+                            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">kwarg</span><span class="p">),</span> <span class="n">kwarg_type</span><span class="p">):</span>
+                                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">kwarg_type</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">kwarg</span><span class="p">)))</span>
+                        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwarg_type</span><span class="p">,</span> <span class="n">OneOfType</span><span class="p">):</span>
+                            <span class="n">oneOfType</span> <span class="o">=</span> <span class="n">kwarg_type</span>
+                            <span class="k">if</span> <span class="ow">not</span> <span class="n">oneOfType</span><span class="o">.</span><span class="n">is_matched</span><span class="p">(</span><span class="n">kwarg</span><span class="p">):</span>
+                                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting one of </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">oneOfType</span><span class="o">.</span><span class="n">arg_types</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">kwarg</span><span class="p">)))</span>
+                        <span class="k">elif</span> <span class="n">kwarg_type</span> <span class="o">==</span> <span class="n">callable</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">kwarg</span><span class="p">):</span>
+                                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting function or method, but recevied </span><span class="si">{type}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">kwarg</span><span class="p">)))</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwarg</span><span class="p">,</span> <span class="n">kwarg_type</span><span class="p">):</span>
+                                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">kwarg_type</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">kwarg</span><span class="p">)))</span>
+
+            <span class="k">return</span> <span class="n">decorated_method</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">decorator</span>
+
+
+<div class="viewcode-block" id="MType"><a class="viewcode-back" href="../../gates.html#core.layer.gates.MType">[docs]</a><span class="k">class</span> <span class="nc">MType</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">Validator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Description - Validate input argument types for methods.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">            args -</span>
+<span class="sd">            kwarg -</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_arg_types</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kwarg_types</span> <span class="o">=</span> <span class="n">kwargs</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">decorated_method</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description -</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Description -</span>
+<span class="sd">            Arguments:</span>
+<span class="sd">            Returns:</span>
+<span class="sd">                decorator</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">arg_self</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="n">args_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+            <span class="n">kwargs_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">arg_types_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_arg_types</span><span class="p">)</span>
+            <span class="n">kwarg_types_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_kwarg_types</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">arg_types_len</span> <span class="o">+</span> <span class="n">kwarg_types_len</span><span class="p">)</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">args_len</span> <span class="o">+</span> <span class="n">kwargs_len</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="s1">&#39;Mismatched number of arguments and argument validation types. Expecting </span><span class="si">{len1}</span><span class="s1"> or less, but recevied </span><span class="si">{len2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">len1</span><span class="o">=</span><span class="n">arg_types_len</span><span class="p">,</span>
+                        <span class="n">len2</span><span class="o">=</span><span class="n">args_len</span> <span class="o">+</span> <span class="n">kwargs_len</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">args_len</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">arg_type</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arg_types</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg_type</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="n">arg</span><span class="p">))</span>
+                        <span class="k">for</span> <span class="n">inner_arg</span> <span class="ow">in</span> <span class="n">arg</span><span class="p">:</span>
+                            <span class="k">for</span> <span class="n">inner_arg_type</span> <span class="ow">in</span> <span class="n">arg_type</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_arg_type</span><span class="p">,</span> <span class="n">OneOfType</span><span class="p">):</span>
+                                    <span class="n">oneOfType</span> <span class="o">=</span> <span class="n">inner_arg_type</span>
+                                    <span class="k">if</span> <span class="ow">not</span> <span class="n">oneOfType</span><span class="o">.</span><span class="n">is_matched</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">):</span>
+                                        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting one of </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">oneOfType</span><span class="o">.</span><span class="n">arg_types</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">)))</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_arg_type</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">),</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">),</span> <span class="n">inner_arg_type</span><span class="p">):</span>
+                                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">),</span> <span class="n">inner_arg_type</span><span class="p">):</span>
+                                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">inner_arg_type</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">)))</span>
+                                    <span class="k">elif</span> <span class="n">inner_arg_type</span> <span class="o">==</span> <span class="n">callable</span><span class="p">:</span>
+                                        <span class="k">if</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">):</span>
+                                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting function or method, but recevied </span><span class="si">{type}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">)))</span>
+                                    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">,</span> <span class="n">inner_arg_type</span><span class="p">):</span>
+                                        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting one of </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">inner_arg_type</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="n">inner_arg</span><span class="p">))</span>
+                    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg_type</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="n">arg</span><span class="p">))</span>
+                        <span class="k">for</span> <span class="n">inner_arg</span> <span class="ow">in</span> <span class="n">arg</span><span class="p">:</span>
+                            <span class="k">for</span> <span class="n">inner_arg_type</span> <span class="ow">in</span> <span class="n">arg_type</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_arg_type</span><span class="p">,</span> <span class="n">OneOfType</span><span class="p">):</span>
+                                    <span class="n">oneOfType</span> <span class="o">=</span> <span class="n">inner_arg_type</span>
+                                    <span class="k">if</span> <span class="ow">not</span> <span class="n">oneOfType</span><span class="o">.</span><span class="n">is_matched</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">):</span>
+                                        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting one of </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">oneOfType</span><span class="o">.</span><span class="n">arg_types</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">)))</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_arg_type</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">),</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">),</span> <span class="n">inner_arg_type</span><span class="p">):</span>
+                                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">),</span> <span class="n">inner_arg_type</span><span class="p">):</span>
+                                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">inner_arg_type</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">)))</span>
+                                    <span class="k">elif</span> <span class="n">inner_arg_type</span> <span class="o">==</span> <span class="n">callable</span><span class="p">:</span>
+                                        <span class="k">if</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">):</span>
+                                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting function or method, but recevied </span><span class="si">{type}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">)))</span>
+                                    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_arg</span><span class="p">,</span> <span class="n">inner_arg_type</span><span class="p">):</span>
+                                        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting one of </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">inner_arg_type</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="n">inner_arg</span><span class="p">))</span>
+                    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg_type</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">),</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">),</span> <span class="n">arg_type</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">),</span> <span class="n">arg_type</span><span class="p">):</span>
+                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">arg_type</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)))</span>
+                    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg_type</span><span class="p">,</span> <span class="n">OneOfType</span><span class="p">):</span>
+                        <span class="n">oneOfType</span> <span class="o">=</span> <span class="n">arg_type</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">oneOfType</span><span class="o">.</span><span class="n">is_matched</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting one of </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">oneOfType</span><span class="o">.</span><span class="n">arg_types</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)))</span>
+                    <span class="k">elif</span> <span class="n">arg_type</span> <span class="o">==</span> <span class="n">callable</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting function or method, but recevied </span><span class="si">{type}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">arg_type</span><span class="p">):</span>
+                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">arg_type</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)))</span>
+            <span class="k">if</span> <span class="n">kwargs_len</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">kwarg_key</span><span class="p">,</span> <span class="n">kwarg</span><span class="p">)</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">kwarg_key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kwarg_types</span><span class="p">:</span>
+                        <span class="n">kwarg_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kwarg_types</span><span class="p">[</span><span class="n">kwarg_key</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwarg_type</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwarg</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="n">kwarg</span><span class="p">))</span>
+                            <span class="k">for</span> <span class="n">inner_kwarg</span> <span class="ow">in</span> <span class="n">kwarg</span><span class="p">:</span>
+                                <span class="k">for</span> <span class="n">inner_kwarg_type</span> <span class="ow">in</span> <span class="n">kwarg_type</span><span class="p">:</span>
+                                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_kwarg_type</span><span class="p">,</span> <span class="n">OneOfType</span><span class="p">):</span>
+                                        <span class="n">oneOfType</span> <span class="o">=</span> <span class="n">inner_kwarg_type</span>
+                                        <span class="k">if</span> <span class="ow">not</span> <span class="n">oneOfType</span><span class="o">.</span><span class="n">is_matched</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">):</span>
+                                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting one of </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">oneOfType</span><span class="o">.</span><span class="n">arg_types</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">)))</span>
+                                    <span class="k">else</span><span class="p">:</span>
+                                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_kwarg_type</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">),</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">),</span> <span class="n">inner_kwarg_type</span><span class="p">):</span>
+                                            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">),</span> <span class="n">inner_kwarg_type</span><span class="p">):</span>
+                                                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">inner_kwarg</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">)))</span>
+                                        <span class="k">elif</span> <span class="n">inner_kwarg_type</span> <span class="o">==</span> <span class="n">callable</span><span class="p">:</span>
+                                            <span class="k">if</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">):</span>
+                                                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting function or method, but recevied </span><span class="si">{type}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="n">inner_kwarg</span><span class="p">)))</span>
+                                        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">,</span> <span class="n">inner_kwarg_type</span><span class="p">):</span>
+                                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting one of </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">inner_kwarg_type</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="n">inner_kwarg</span><span class="p">))</span>
+                        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwarg_type</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwarg</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="n">kwarg</span><span class="p">))</span>
+                            <span class="k">for</span> <span class="n">inner_kwarg</span> <span class="ow">in</span> <span class="n">kwarg</span><span class="p">:</span>
+                                <span class="k">for</span> <span class="n">inner_kwarg_type</span> <span class="ow">in</span> <span class="n">kwarg_type</span><span class="p">:</span>
+                                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_kwarg_type</span><span class="p">,</span> <span class="n">OneOfType</span><span class="p">):</span>
+                                        <span class="n">oneOfType</span> <span class="o">=</span> <span class="n">inner_kwarg_type</span>
+                                        <span class="k">if</span> <span class="ow">not</span> <span class="n">oneOfType</span><span class="o">.</span><span class="n">is_matched</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">):</span>
+                                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting one of </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">oneOfType</span><span class="o">.</span><span class="n">arg_types</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">)))</span>
+                                    <span class="k">else</span><span class="p">:</span>
+                                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_kwarg_type</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">),</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">),</span> <span class="n">inner_kwarg_type</span><span class="p">):</span>
+                                            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">),</span> <span class="n">inner_kwarg_type</span><span class="p">):</span>
+                                                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">inner_kwarg</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">)))</span>
+                                        <span class="k">elif</span> <span class="n">inner_kwarg_type</span> <span class="o">==</span> <span class="n">callable</span><span class="p">:</span>
+                                            <span class="k">if</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">):</span>
+                                                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting function or method, but recevied </span><span class="si">{type}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="n">inner_kwarg</span><span class="p">)))</span>
+                                        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_kwarg</span><span class="p">,</span> <span class="n">inner_kwarg_type</span><span class="p">):</span>
+                                            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting one of </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">inner_kwarg_type</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="n">inner_kwarg</span><span class="p">))</span>
+                        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwarg_type</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">kwarg</span><span class="p">),</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">kwarg</span><span class="p">),</span> <span class="n">kwarg_type</span><span class="p">):</span>
+                            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">kwarg</span><span class="p">),</span> <span class="n">kwarg_type</span><span class="p">):</span>
+                                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">kwarg_type</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">kwarg</span><span class="p">)))</span>
+                        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwarg_type</span><span class="p">,</span> <span class="n">OneOfType</span><span class="p">):</span>
+                            <span class="n">oneOfType</span> <span class="o">=</span> <span class="n">kwarg_type</span>
+                            <span class="k">if</span> <span class="ow">not</span> <span class="n">oneOfType</span><span class="o">.</span><span class="n">is_matched</span><span class="p">(</span><span class="n">kwarg</span><span class="p">):</span>
+                                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting one of </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">oneOfType</span><span class="o">.</span><span class="n">arg_types</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">kwarg</span><span class="p">)))</span>
+                        <span class="k">elif</span> <span class="n">kwarg_type</span> <span class="o">==</span> <span class="n">callable</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">kwarg</span><span class="p">):</span>
+                                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting function or method, but recevied </span><span class="si">{type}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">kwarg</span><span class="p">)))</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwarg</span><span class="p">,</span> <span class="n">kwarg_type</span><span class="p">):</span>
+                                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched argument type. Expecting </span><span class="si">{type1}</span><span class="s1">, but recevied </span><span class="si">{type2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">type1</span><span class="o">=</span><span class="n">kwarg_type</span><span class="p">,</span> <span class="n">type2</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">kwarg</span><span class="p">)))</span>
+
+            <span class="k">return</span> <span class="n">decorated_method</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">arg_self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">decorator</span></div>
+
+
+<span class="k">class</span> <span class="nc">MShape</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">Validator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Description - Validate input vector shape.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@MType</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">transpose</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">transpose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">            axis - the axis to check the shape</span>
+<span class="sd">            transpose - check the transpose of shape</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">axis</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid axis </span><span class="si">{axis}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_axis</span> <span class="o">=</span> <span class="n">axis</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_transpose</span> <span class="o">=</span> <span class="n">transpose</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">decorated_method</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description -</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Description -</span>
+<span class="sd">            Arguments:</span>
+<span class="sd">            Returns:</span>
+<span class="sd">                decorator</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">arg_self</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="n">ref_shape</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">arg_self</span><span class="p">,</span> <span class="s1">&#39;shape&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ref_shape</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Missing shape attribute in </span><span class="si">{arg_self}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg_self</span><span class="o">=</span><span class="n">arg_self</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transpose</span><span class="p">:</span>
+                    <span class="n">ref_shape</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">ref_shape</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+                    <span class="n">shape</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="s1">&#39;shape&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">shape</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+                            <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)</span> <span class="o">+</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_axis</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">ref_shape</span> <span class="o">!=</span> <span class="n">shape</span><span class="p">:</span>
+                                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched tensor shape. Expecting </span><span class="si">{shape1}</span><span class="s1">, but recevied </span><span class="si">{shape2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">shape1</span><span class="o">=</span><span class="n">ref_shape</span><span class="p">,</span> <span class="n">shape2</span><span class="o">=</span><span class="n">shape</span><span class="p">))</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">ref_shape</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_axis</span><span class="p">]</span> <span class="o">!=</span> <span class="n">shape</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_axis</span><span class="p">]:</span>
+                                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched tensor shape. Expecting </span><span class="si">{shape1}</span><span class="s1">, but recevied </span><span class="si">{shape2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">shape1</span><span class="o">=</span><span class="n">ref_shape</span><span class="p">,</span> <span class="n">shape2</span><span class="o">=</span><span class="n">shape</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">kwarg</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                    <span class="n">shape</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">kwarg</span><span class="p">,</span> <span class="s1">&#39;shape&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">shape</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+                            <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)</span> <span class="o">+</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_axis</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">ref_shape</span> <span class="o">!=</span> <span class="n">shape</span><span class="p">:</span>
+                                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched tensor shape. Expecting </span><span class="si">{shape1}</span><span class="s1">, but recevied </span><span class="si">{shape2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">shape1</span><span class="o">=</span><span class="n">ref_shape</span><span class="p">,</span> <span class="n">shape2</span><span class="o">=</span><span class="n">shape</span><span class="p">))</span>
+                        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_axis</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">ref_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched tensor column shape. Expecting </span><span class="si">{shape1}</span><span class="s1">, but recevied </span><span class="si">{shape2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">shape1</span><span class="o">=</span><span class="n">ref_shape</span><span class="p">,</span> <span class="n">shape2</span><span class="o">=</span><span class="n">shape</span><span class="p">))</span>
+                        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_axis</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">ref_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Mismatched tensor row shape. Expecting </span><span class="si">{shape1}</span><span class="s1">, but recevied </span><span class="si">{shape2}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">shape1</span><span class="o">=</span><span class="n">ref_shape</span><span class="p">,</span> <span class="n">shape2</span><span class="o">=</span><span class="n">shape</span><span class="p">))</span>
+                <span class="k">return</span> <span class="n">decorated_method</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">arg_self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">decorator</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Tuan Le
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

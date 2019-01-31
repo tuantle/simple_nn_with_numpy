@@ -1,0 +1,1086 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>core.layer.gates &mdash; Prototype 0.1.0.beta documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Prototype
+          
+
+          
+            
+            <img src="../../../_static/logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/model/nn/feed_forward.html">Feed Forward</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Prototype</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>core.layer.gates</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for core.layer.gates</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2016-present Tuan Le.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the MIT License.</span>
+<span class="c1"># You may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.html</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="c1">#</span>
+<span class="c1"># ------------------------------------------------------------------------</span>
+<span class="c1">#</span>
+<span class="c1"># Author Tuan Le (tuan.t.lei@gmail.com)</span>
+<span class="c1">#</span>
+<span class="c1"># ------------------------------------------------------------------------</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">abc</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">util.const</span> <span class="k">import</span> <span class="n">CONST</span>
+<span class="kn">from</span> <span class="nn">util.validation</span> <span class="k">import</span> <span class="n">MShape</span><span class="p">,</span> <span class="n">MType</span><span class="p">,</span> <span class="n">OneOfType</span>
+<span class="kn">from</span> <span class="nn">core.layer.layer</span> <span class="k">import</span> <span class="n">Layer</span>
+<span class="kn">from</span> <span class="nn">core.initializers</span> <span class="k">import</span> <span class="n">Constant</span>
+
+<span class="c1"># ------------------------------------------------------------------------</span>
+
+
+<span class="k">class</span> <span class="nc">GATE</span><span class="p">(</span><span class="n">CONST</span><span class="p">):</span>
+    <span class="n">ARRANGEMENT</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">)</span>
+    <span class="n">FORWARD_PASS_COMPLETED</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">BACKWARD_PASS_COMPLETED</span> <span class="o">=</span> <span class="mi">2</span>
+
+
+<span class="k">class</span> <span class="nc">NONLINEAR</span><span class="p">(</span><span class="n">GATE</span><span class="p">):</span>
+    <span class="n">SOFT_PLUS_GAMMA</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">SOFT_PLUS_ALPHA</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">SOFT_PLUS_BETA</span> <span class="o">=</span> <span class="mf">1e-3</span>
+
+    <span class="n">SOFT_RAMP_GAMMA</span> <span class="o">=</span> <span class="mi">15</span>
+    <span class="n">SOFT_RAMP_ALPHA</span> <span class="o">=</span> <span class="mf">1e-3</span>
+    <span class="n">SOFT_RAMP_BETA</span> <span class="o">=</span> <span class="mf">1e-3</span>
+
+    <span class="n">SWISH_GAMMA</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">SWISH_ALPHA</span> <span class="o">=</span> <span class="mf">1e-3</span>
+    <span class="n">SWISH_BETA</span> <span class="o">=</span> <span class="mf">1e-3</span>
+
+    <span class="n">SIGMOID_GAMMA</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">TANH_GAMMA</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="c1"># ------------------------------------------------------------------------</span>
+
+
+<div class="viewcode-block" id="Gate"><a class="viewcode-back" href="../../../gates.html#core.layer.gates.Gate">[docs]</a><span class="k">class</span> <span class="nc">Gate</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Module - Gate</span>
+<span class="sd">    Description - Abtraction of a base linear &amp; nonlinear gate layer</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@MType</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span>
+           <span class="n">name</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span>
+                 <span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">            size - gate size</span>
+<span class="sd">            name - gate name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_z_t</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_a_t</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_azg_t</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_monitor</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pass_seq</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">reconfig</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Return as human readable string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@MType</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">is_label</span><span class="p">(</span><span class="n">label</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Check if string is = label</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">            label -</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            is label</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;gate&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+
+    <span class="c1"># ------------------------------------------------------------------------</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Get gate label</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            label key</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;gate&#39;</span> <span class="o">+</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">label</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">arrangement</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Get gate arrangement</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            arrangement keys</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">GATE</span><span class="o">.</span><span class="n">ARRANGEMENT</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Get gate size</span>
+<span class="sd">        Returns:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Get gate forward pass input tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z_t</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z_t</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">outputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Get gate forward pass output tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_a_t</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_a_t</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Gate.reset"><a class="viewcode-back" href="../../../gates.html#core.layer.gates.Gate.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Reset internal evaluation states</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pass_seq</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_z_t</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_a_t</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_azg_t</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Gate.unassign_hooks"><a class="viewcode-back" href="../../../gates.html#core.layer.gates.Gate.unassign_hooks">[docs]</a>    <span class="k">def</span> <span class="nf">unassign_hooks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Unassign all callback functions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_monitor</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+    <span class="nd">@MType</span><span class="p">(</span><span class="n">monitor</span><span class="o">=</span><span class="n">OneOfType</span><span class="p">(</span><span class="n">callable</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+    <span class="k">def</span> <span class="nf">assign_hook</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">monitor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Assign callback functions</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">            monitor - callback function to do probing during forward/backward pass</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">monitor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_monitor</span> <span class="o">=</span> <span class="n">monitor</span>
+
+    <span class="nd">@MType</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">OneOfType</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+    <span class="k">def</span> <span class="nf">reconfig</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Reconfig gate</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">            size - gate size</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">reconfig</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="p">))</span></div>
+
+<span class="c1"># ------------------------------------------------------------------------</span>
+
+
+<div class="viewcode-block" id="Linear"><a class="viewcode-back" href="../../../gates.html#core.layer.gates.Linear">[docs]</a><span class="k">class</span> <span class="nc">Linear</span><span class="p">(</span><span class="n">Gate</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Module - Linear</span>
+<span class="sd">    Description - A linear gate layer</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@MType</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span>
+           <span class="n">name</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span>
+                 <span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">            size - linear gate size</span>
+<span class="sd">            name - linear gate name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Return as human readable string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@MType</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">is_label</span><span class="p">(</span><span class="n">label</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Check if string is = label</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">            label -</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            is label</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;linear&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+
+    <span class="c1"># ------------------------------------------------------------------------</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Get linear gate label</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            label key</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;linear_&#39;</span> <span class="o">+</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">label</span>
+
+    <span class="nd">@MType</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="n">OneOfType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+    <span class="nd">@MShape</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">z_t</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Do forward pass by passing the input (z) tensor directly out as output (a) tensor</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">            epoch -</span>
+<span class="sd">            z_t - input (z) tensor</span>
+<span class="sd">            stage -</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            tail</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_a_t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z_t</span> <span class="o">=</span> <span class="n">z_t</span>  <span class="c1"># z_t.copy()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_monitor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">report</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;epoch&#39;</span><span class="p">:</span> <span class="n">epoch</span><span class="p">,</span>
+                <span class="s1">&#39;stage&#39;</span><span class="p">:</span> <span class="n">stage</span><span class="p">,</span>
+                <span class="s1">&#39;pass&#39;</span><span class="p">:</span> <span class="s1">&#39;forward&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span>
+                <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span>
+            <span class="p">}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_monitor</span><span class="p">(</span><span class="n">report</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pass_seq</span> <span class="o">=</span> <span class="n">GATE</span><span class="o">.</span><span class="n">FORWARD_PASS_COMPLETED</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_next</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">next</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_a_t</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="n">stage</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Linear gate </span><span class="si">{name}</span><span class="s1"> connection is incomplete. Missing connection to next layer.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="ne">UserWarning</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="nd">@MType</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="n">OneOfType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+    <span class="nd">@MShape</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">eag_t</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Do backward backward pass by passing 1 as gradient tensor of the input tensor</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">            epoch -</span>
+<span class="sd">            eag_t - error gradient w.r.t. post-nonlinear (a) tensor</span>
+<span class="sd">            stage -</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            head</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pass_seq</span> <span class="o">!=</span> <span class="n">GATE</span><span class="o">.</span><span class="n">FORWARD_PASS_COMPLETED</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Linear gate </span><span class="si">{name}</span><span class="s1"> cannot do backward pass. Need to run forward pass first.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="ne">UserWarning</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_azg_t</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">_z_t</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_monitor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">report</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;epoch&#39;</span><span class="p">:</span> <span class="n">epoch</span><span class="p">,</span>
+                    <span class="s1">&#39;stage&#39;</span><span class="p">:</span> <span class="n">stage</span><span class="p">,</span>
+                    <span class="s1">&#39;pass&#39;</span><span class="p">:</span> <span class="s1">&#39;backward&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;grad&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s1">&#39;az&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_azg_t</span><span class="p">,</span>
+                        <span class="s1">&#39;ea&#39;</span><span class="p">:</span> <span class="n">eag_t</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_monitor</span><span class="p">(</span><span class="n">report</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pass_seq</span> <span class="o">=</span> <span class="n">GATE</span><span class="o">.</span><span class="n">BACKWARD_PASS_COMPLETED</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_prev</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_azg_t</span><span class="p">,</span> <span class="n">eag_t</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="n">stage</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span></div>
+
+<span class="c1"># ------------------------------------------------------------------------</span>
+
+
+<div class="viewcode-block" id="Nonlinear"><a class="viewcode-back" href="../../../gates.html#core.layer.gates.Nonlinear">[docs]</a><span class="k">class</span> <span class="nc">Nonlinear</span><span class="p">(</span><span class="n">Gate</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Module - Nonlinear</span>
+<span class="sd">    Description - A base nonlinear gate layer.</span>
+<span class="sd">                  Manages and computes nonlinearity output from input tensor</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@MType</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span>
+                 <span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">            size - nonlinear gate size</span>
+<span class="sd">            name - nonlinear gate name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Return as human readable string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@MType</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">is_label</span><span class="p">(</span><span class="n">label</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Check if string is = label</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">            label -</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            is label</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;nonlinear&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+
+    <span class="c1"># ------------------------------------------------------------------------</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Get nonlinear gate label</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            label key</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;nonlinear_&#39;</span> <span class="o">+</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">label</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_compute_nonlinearity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Compute the nonlinear function to get the post-nonlinear (a) tensor from pre-nonlinear (z) tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_compute_nonlinearity_grad</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Compute the nonlinear function to get the gradient post-nonlinear (a) tensor w.r.t. pre-nonlinear (z) tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@MType</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="n">OneOfType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+    <span class="nd">@MShape</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">z_t</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Do forward pass by calculating nonlinear tensor of the input (z) tensor</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">            epoch -</span>
+<span class="sd">            z_t - pre-nonlinear (z) tensor</span>
+<span class="sd">            stage -</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            tail</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_z_t</span> <span class="o">=</span> <span class="n">z_t</span>  <span class="c1"># z_t.copy()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_compute_nonlinearity</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_monitor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">report</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;epoch&#39;</span><span class="p">:</span> <span class="n">epoch</span><span class="p">,</span>
+                <span class="s1">&#39;stage&#39;</span><span class="p">:</span> <span class="n">stage</span><span class="p">,</span>
+                <span class="s1">&#39;pass&#39;</span><span class="p">:</span> <span class="s1">&#39;forward&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span>
+                <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span>
+            <span class="p">}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_monitor</span><span class="p">(</span><span class="n">report</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pass_seq</span> <span class="o">=</span> <span class="n">GATE</span><span class="o">.</span><span class="n">FORWARD_PASS_COMPLETED</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_next</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">next</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_a_t</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="n">stage</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Nonlinear gate </span><span class="si">{name}</span><span class="s1"> connection is incomplete. Missing connection to next layer.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="ne">UserWarning</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="nd">@MType</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="n">OneOfType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+    <span class="nd">@MShape</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">eag_t</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Do backward backward pass by calculating gradient of the forward pass input (z) tensor</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">            epoch -</span>
+<span class="sd">            eag_t - error gradient w.r.t. post-nonlinear (a) tensor</span>
+<span class="sd">            stage -</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            head</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pass_seq</span> <span class="o">!=</span> <span class="n">GATE</span><span class="o">.</span><span class="n">FORWARD_PASS_COMPLETED</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Nonlinear gate </span><span class="si">{name}</span><span class="s1"> cannot do backward pass. Need to run forward pass first.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="ne">UserWarning</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_compute_nonlinearity_grad</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_monitor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">report</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;epoch&#39;</span><span class="p">:</span> <span class="n">epoch</span><span class="p">,</span>
+                    <span class="s1">&#39;stage&#39;</span><span class="p">:</span> <span class="n">stage</span><span class="p">,</span>
+                    <span class="s1">&#39;pass&#39;</span><span class="p">:</span> <span class="s1">&#39;backward&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;grad&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s1">&#39;az&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_azg_t</span><span class="p">,</span>
+                        <span class="s1">&#39;ea&#39;</span><span class="p">:</span> <span class="n">eag_t</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_monitor</span><span class="p">(</span><span class="n">report</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pass_seq</span> <span class="o">=</span> <span class="n">GATE</span><span class="o">.</span><span class="n">BACKWARD_PASS_COMPLETED</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_prev</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_azg_t</span><span class="p">,</span> <span class="n">eag_t</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="n">stage</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span></div>
+
+
+<span class="c1"># ------------------------------------------------------------------------</span>
+
+
+<div class="viewcode-block" id="ReLU"><a class="viewcode-back" href="../../../gates.html#core.layer.gates.ReLU">[docs]</a><span class="k">class</span> <span class="nc">ReLU</span><span class="p">(</span><span class="n">Nonlinear</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A rectifier linear unit gate.\n</span>
+<span class="sd">    Arguments:</span>
+<span class="sd">        size: nonlinear gate size\n</span>
+<span class="sd">        name: nonlinear gate name\n</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@MType</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return as human readable string.\n</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@MType</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">is_label</span><span class="p">(</span><span class="n">label</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if string is equal label.\n</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">            label:</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;relu&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+
+    <span class="c1"># ------------------------------------------------------------------------</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get ReLU gate label.\n</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;relu_&#39;</span> <span class="o">+</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">label</span>
+
+    <span class="k">def</span> <span class="nf">_compute_nonlinearity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Compute the nonlinear function to get the post-nonlinearity (a) tensor from pre-nonlinearity (z) tensor</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            post-nonlinearity tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># self._a_t = self._z_t.copy()</span>
+        <span class="c1"># self._a_t[self._a_t &lt; 0] = 0</span>
+        <span class="c1"># self._a_t = np.maximum(self._z_t, 0, self._z_t)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_a_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_z_t</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_z_t</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_a_t</span>
+
+    <span class="k">def</span> <span class="nf">_compute_nonlinearity_grad</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Compute the nonlinear function to get the gradient post-nonlinearity (a) tensor w.r.t. pre-nonlinearity (z) tensor</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            post-nonlinearity (a) tensor w.r.t. pre-nonlinearity (z) tensor gradient vector</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># self._azg_t = np.heaviside(self._z_t, 0, dtype=np.float32)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_azg_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_z_t</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_azg_t</span></div>
+
+
+<span class="c1"># ------------------------------------------------------------------------</span>
+
+
+<span class="k">class</span> <span class="nc">SoftPlus</span><span class="p">(</span><span class="n">Nonlinear</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Module - SoftPlus</span>
+<span class="sd">    Description - A soft plus nonlinear gate.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@MType</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">            size - nonlinear gate size</span>
+<span class="sd">            name - nonlinear gate name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Return as human readable string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@MType</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">is_label</span><span class="p">(</span><span class="n">label</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Check if string is = label</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">            label -</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            is label</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;softplus&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+
+    <span class="c1"># ------------------------------------------------------------------------</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Get nonlinear gate label</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            label key</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;softplus_&#39;</span> <span class="o">+</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">label</span>
+
+    <span class="k">def</span> <span class="nf">_compute_nonlinearity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Compute the nonlinear function to get the post-nonlinearity (a) tensor from pre-nonlinearity (z) tensor</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            post-nonlinearity tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">exp_of_z_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">NONLINEAR</span><span class="o">.</span><span class="n">SOFT_PLUS_GAMMA</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z_t</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_a_t</span> <span class="o">=</span> <span class="n">NONLINEAR</span><span class="o">.</span><span class="n">SOFT_PLUS_ALPHA</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">exp_of_z_t</span><span class="p">)</span> <span class="o">+</span> <span class="n">NONLINEAR</span><span class="o">.</span><span class="n">SOFT_PLUS_BETA</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z_t</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_a_t</span>
+
+    <span class="k">def</span> <span class="nf">_compute_nonlinearity_grad</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Compute the nonlinear function to get the gradient post-nonlinearity (a) tensor w.r.t. pre-nonlinearity (z) tensor</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            post-nonlinearity (a) tensor w.r.t. pre-nonlinearity (z) tensor gradient vector</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_azg_t</span> <span class="o">=</span> <span class="n">NONLINEAR</span><span class="o">.</span><span class="n">SOFT_PLUS_ALPHA</span> <span class="o">*</span> <span class="n">NONLINEAR</span><span class="o">.</span><span class="n">SOFT_PLUS_GAMMA</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">logaddexp</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">NONLINEAR</span><span class="o">.</span><span class="n">SOFT_PLUS_GAMMA</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z_t</span><span class="p">))</span> <span class="o">+</span> <span class="n">NONLINEAR</span><span class="o">.</span><span class="n">SOFT_PLUS_BETA</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_azg_t</span>
+
+
+<span class="c1"># ------------------------------------------------------------------------</span>
+
+
+<span class="k">class</span> <span class="nc">SoftRamp</span><span class="p">(</span><span class="n">Nonlinear</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Module - SoftRamp</span>
+<span class="sd">    Description - A soft ramp nonlinear gate.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@MType</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">            size - nonlinear gate size</span>
+<span class="sd">            name - nonlinear gate name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Return as human readable string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@MType</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">is_label</span><span class="p">(</span><span class="n">label</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Check if string is = label</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">            label -</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            is label</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;softramp&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+
+    <span class="c1"># ------------------------------------------------------------------------</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Get nonlinear gate label</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            label key</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;softramp_&#39;</span> <span class="o">+</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">label</span>
+
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Reset internal evaluation states</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">_compute_nonlinearity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Compute the nonlinear function to get the post-nonlinearity (a) tensor from pre-nonlinearity (z) tensor</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            post-nonlinearity tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">exp_of_z_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">NONLINEAR</span><span class="o">.</span><span class="n">SOFT_RAMP_GAMMA</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z_t</span> <span class="o">+</span> <span class="mf">1e-12</span><span class="p">)</span>
+        <span class="n">inv_exp_of_z_t</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">exp_of_z_t</span> <span class="o">+</span> <span class="n">NONLINEAR</span><span class="o">.</span><span class="n">SOFT_RAMP_BETA</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z_t</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_a_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_z_t</span><span class="p">,</span> <span class="n">inv_exp_of_z_t</span><span class="p">)</span> <span class="o">+</span> <span class="n">NONLINEAR</span><span class="o">.</span><span class="n">SOFT_RAMP_ALPHA</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z_t</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_a_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span><span class="k">lambda</span> <span class="n">element</span><span class="p">:</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">NONLINEAR</span><span class="o">.</span><span class="n">SOFT_RAMP_GAMMA</span> <span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="n">element</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e2</span> <span class="k">else</span> <span class="n">element</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">_a_t</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span> <span class="o">=</span> <span class="p">(</span><span class="n">exp_of_z_t</span><span class="p">,</span> <span class="n">inv_exp_of_z_t</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_a_t</span>
+
+    <span class="k">def</span> <span class="nf">_compute_nonlinearity_grad</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Compute the nonlinear function to get the gradient post-nonlinearity (a) tensor w.r.t. pre-nonlinearity (z) tensor</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            post-nonlinearity (a) tensor w.r.t. pre-nonlinearity (z) tensor gradient vector</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="p">(</span><span class="n">exp_of_z_t</span><span class="p">,</span> <span class="n">inv_exp_of_z_t</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_azg_t</span> <span class="o">=</span> <span class="n">inv_exp_of_z_t</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_z_t</span><span class="p">,</span> <span class="n">NONLINEAR</span><span class="o">.</span><span class="n">SOFT_RAMP_GAMMA</span> <span class="o">*</span> <span class="n">exp_of_z_t</span> <span class="o">+</span> <span class="n">NONLINEAR</span><span class="o">.</span><span class="n">SOFT_RAMP_BETA</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">inv_exp_of_z_t</span><span class="p">))</span> <span class="o">+</span> <span class="n">NONLINEAR</span><span class="o">.</span><span class="n">SOFT_RAMP_ALPHA</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_azg_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span><span class="k">lambda</span> <span class="n">element</span><span class="p">:</span> <span class="mf">0.5</span> <span class="o">+</span> <span class="n">NONLINEAR</span><span class="o">.</span><span class="n">SOFT_RAMP_ALPHA</span> <span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="n">element</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e2</span> <span class="k">else</span> <span class="n">element</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">_azg_t</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_azg_t</span>
+
+
+<span class="c1"># ------------------------------------------------------------------------</span>
+
+
+<span class="k">class</span> <span class="nc">Swish</span><span class="p">(</span><span class="n">Nonlinear</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Module - Swish</span>
+<span class="sd">    Description - A swish nonlinear gate.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@MType</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">            size - nonlinear gate size</span>
+<span class="sd">            name - nonlinear gate name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Return as human readable string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@MType</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">is_label</span><span class="p">(</span><span class="n">label</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Check if string is = label</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">            label -</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            is label</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;swish&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+
+    <span class="c1"># ------------------------------------------------------------------------</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Get nonlinear gate label</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            label key</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;swish_&#39;</span> <span class="o">+</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">label</span>
+
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Reset internal evaluation states</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">_compute_nonlinearity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Compute the nonlinear function to get the post-nonlinearity (a) tensor from pre-nonlinearity (z) tensor</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            post-nonlinearity tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">exp_of_z_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">NONLINEAR</span><span class="o">.</span><span class="n">SWISH_GAMMA</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z_t</span> <span class="o">+</span> <span class="mf">1e-12</span><span class="p">)</span>
+        <span class="n">inv_exp_of_z_t</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">exp_of_z_t</span> <span class="o">+</span> <span class="n">NONLINEAR</span><span class="o">.</span><span class="n">SOFT_RAMP_BETA</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z_t</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_a_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_z_t</span><span class="p">,</span> <span class="n">inv_exp_of_z_t</span><span class="p">)</span> <span class="o">+</span> <span class="n">NONLINEAR</span><span class="o">.</span><span class="n">SWISH_ALPHA</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z_t</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span> <span class="o">=</span> <span class="p">(</span><span class="n">exp_of_z_t</span><span class="p">,</span> <span class="n">inv_exp_of_z_t</span><span class="p">)</span>
+
+        <span class="c1"># sigmoid_of_z_t = np.exp(-np.logaddexp(0, -NONLINEAR.SWISH_GAMMA * self._z_t))</span>
+        <span class="c1">#</span>
+        <span class="c1"># self._a_t = np.multiply(self._z_t, sigmoid_of_z_t)</span>
+        <span class="c1">#</span>
+        <span class="c1"># self._cache = sigmoid_of_z_t</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_a_t</span>
+
+    <span class="k">def</span> <span class="nf">_compute_nonlinearity_grad</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Compute the nonlinear function to get the gradient post-nonlinearity (a) tensor w.r.t. pre-nonlinearity (z) tensor</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            post-nonlinearity (a) tensor w.r.t. pre-nonlinearity (z) tensor gradient vector</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="p">(</span><span class="n">exp_of_z_t</span><span class="p">,</span> <span class="n">inv_exp_of_z_t</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_azg_t</span> <span class="o">=</span> <span class="n">inv_exp_of_z_t</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_z_t</span><span class="p">,</span> <span class="n">NONLINEAR</span><span class="o">.</span><span class="n">SOFT_RAMP_BETA</span> <span class="o">-</span> <span class="n">NONLINEAR</span><span class="o">.</span><span class="n">SWISH_GAMMA</span> <span class="o">*</span> <span class="n">exp_of_z_t</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">inv_exp_of_z_t</span><span class="p">))</span> <span class="o">+</span> <span class="n">NONLINEAR</span><span class="o">.</span><span class="n">SWISH_ALPHA</span>
+
+        <span class="c1"># sigmoid_of_z_t = self._cache</span>
+        <span class="c1"># self._azg_t = sigmoid_of_z_t + np.multiply(np.multiply(NONLINEAR.SWISH_GAMMA * self._z_t, sigmoid_of_z_t), (1 - sigmoid_of_z_t))</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_azg_t</span>
+
+
+<span class="c1"># ------------------------------------------------------------------------</span>
+
+
+<span class="k">class</span> <span class="nc">Sigmoid</span><span class="p">(</span><span class="n">Nonlinear</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Module - Sigmoid</span>
+<span class="sd">    Description - A sigmoid nonlinear gate.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@MType</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">            size - nonlinear gate size</span>
+<span class="sd">            name - nonlinear gate name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Return as human readable string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@MType</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">is_label</span><span class="p">(</span><span class="n">label</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Check if string is = label</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">            label -</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            is label</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;sigmoid&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+
+    <span class="c1"># ------------------------------------------------------------------------</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Get nonlinear gate label</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            label key</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;sigmoid_&#39;</span> <span class="o">+</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">label</span>
+
+    <span class="k">def</span> <span class="nf">_compute_nonlinearity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Compute the nonlinear function to get the post-nonlinearity (a) tensor from pre-nonlinearity (z) tensor</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            post-nonlinearity tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_a_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">logaddexp</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">NONLINEAR</span><span class="o">.</span><span class="n">SIGMOID_GAMMA</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z_t</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_a_t</span>
+
+    <span class="k">def</span> <span class="nf">_compute_nonlinearity_grad</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Compute the nonlinear function to get the gradient post-nonlinearity (a) tensor w.r.t. pre-nonlinearity (z) tensor</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            post-nonlinearity (a) tensor w.r.t. pre-nonlinearity (z) tensor gradient vector</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_azg_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">NONLINEAR</span><span class="o">.</span><span class="n">SIGMOID_GAMMA</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_a_t</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_a_t</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_azg_t</span>
+
+
+<span class="c1"># ------------------------------------------------------------------------</span>
+
+
+<span class="k">class</span> <span class="nc">Tanh</span><span class="p">(</span><span class="n">Nonlinear</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Module - Tanh</span>
+<span class="sd">    Description - A tanh nonlinear gate.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@MType</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">            size - nonlinear gate size</span>
+<span class="sd">            name - nonlinear gate name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Return as human readable string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@MType</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">is_label</span><span class="p">(</span><span class="n">label</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Check if string is = label</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">            label -</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            is label</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;tanh&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+
+    <span class="c1"># ------------------------------------------------------------------------</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Get nonlinear gate label</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            label key</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;tanh_&#39;</span> <span class="o">+</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">label</span>
+
+    <span class="k">def</span> <span class="nf">_compute_nonlinearity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Compute the nonlinear function to get the post-nonlinearity (a) tensor from pre-nonlinearity (z) tensor</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            post-nonlinearity tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_a_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">NONLINEAR</span><span class="o">.</span><span class="n">TANH_GAMMA</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z_t</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_a_t</span>
+
+    <span class="k">def</span> <span class="nf">_compute_nonlinearity_grad</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Description - Compute the nonlinear function to get the gradient post-nonlinearity (a) tensor w.r.t. pre-nonlinearity (z) tensor</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            post-nonlinearity (a) tensor w.r.t. pre-nonlinearity (z) tensor gradient vector</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_azg_t</span> <span class="o">=</span> <span class="n">NONLINEAR</span><span class="o">.</span><span class="n">TANH_GAMMA</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_a_t</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_azg_t</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Tuan Le
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
