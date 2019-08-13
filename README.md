@@ -459,9 +459,24 @@ pip3 install pandas, matplotlib, seaborn, torch, torchvision
 ---
 
 ### Change Log
+**0.1.1 (8/13/2019)**
+```
+Notes:
+New Features:
+Breaking Changes:
+Improvements:
+    - Replaced string format with f-string.
+Bug fixes
+    - Fixed a bug in Sequencer load_snapshot method.
+```
 **0.1.0 (1/30/2019)**
 ```
+Notes:
     - Initial Commit Version!!!
+New Features:
+Breaking Changes:
+Improvements:
+Bug fixes:
 ```
 
 ### License
