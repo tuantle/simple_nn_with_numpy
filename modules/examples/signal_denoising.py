@@ -54,27 +54,27 @@ class AutoencoderModel(FeedForward):
 
     def construct(self):
         return Sequencer(name='autoencoder').add(
-            'relu',
+            'soft_plus',
             size=8,
             name='encoder_input'
         ).add(
-            'relu',
+            'soft_plus',
             size=6,
             name='encoder_hidden'
         ).reconfig(
-            optim='sgd'
+            optim='adam'
         ).add(
-            'relu',
+            'soft_plus',
             size=4,
             name='latent'
         ).reconfig(
-            optim='sgd'
+            optim='adam'
         ).add(
-            'relu',
+            'soft_plus',
             size=6,
             name='decoder_hidden'
         ).reconfig(
-            optim='sgd'
+            optim='adam'
         ).add(
             'linear',
             size=8,

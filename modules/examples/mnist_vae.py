@@ -241,9 +241,10 @@ def run_example():
                           batch_size=1,
                           shuffle=True)
     for ds in mnist_ds:
-        print('Testing ditgit: {digit}'.format(digit=ds[1].to('cpu').numpy()))
-        ds_t = ds[0].to('cpu').numpy()
-        mnist_img = (0.25 * (ds_t + 1)).clip(0, 1).reshape((ds_t.shape[0], 1, 28, 28))
+        ds0_t = ds[0].to('cpu').numpy()
+        ds1_t = ds[0].to('cpu').numpy()
+        print(f'Testing ditgit: {ds1_t}')
+        mnist_img = (0.25 * (ds0_t + 1)).clip(0, 1).reshape((ds0_t.shape[0], 1, 28, 28))
         break
 
     input_t = mnist_img.reshape((mnist_img.shape[0], 28 * 28))
