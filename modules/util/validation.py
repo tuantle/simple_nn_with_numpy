@@ -147,116 +147,111 @@ class FType(object, metaclass=Validator):
             kwarg_types_len = len(self._kwarg_types)
 
             if (arg_types_len + kwarg_types_len) < (args_len + kwargs_len):
-                raise ValueError(
-                    'Mismatched number of arguments and argument validation types. Expecting {len1} or less, but recevied {len2}.'.format(
-                        len1=arg_types_len,
-                        len2=args_len + kwargs_len
-                    )
-                )
+                raise ValueError(f'Mismatched number of arguments and argument validation types. Expecting {arg_types_len} or less, but recevied {args_len + kwargs_len}.')
             if args_len > 0:
                 for (arg, arg_type) in zip(args, self._arg_types):
                     if isinstance(arg_type, tuple):
                         if not isinstance(arg, tuple):
-                            raise TypeError('Mismatched argument type. Expecting {type1}, but recevied {type2}.'.format(type1=tuple, type2=arg))
+                            raise TypeError(f'Mismatched argument type. Expecting {tuple}, but recevied {arg}.')
                         for inner_arg in arg:
                             for inner_arg_type in arg_type:
                                 if isinstance(inner_arg_type, OneOfType):
                                     oneOfType = inner_arg_type
                                     if not oneOfType.is_matched(inner_arg):
-                                        raise TypeError('Mismatched argument type. Expecting one of {type1}, but recevied {type2}.'.format(type1=oneOfType.arg_types, type2=type(inner_arg)))
+                                        raise TypeError(f'Mismatched argument type. Expecting one of {oneOfType.arg_types}, but recevied {type(inner_arg)}.')
                                 else:
                                     if isinstance(inner_arg_type, type) and isinstance(type(inner_arg), type) and not issubclass(type(inner_arg), inner_arg_type):
                                         if not isinstance(type(inner_arg), inner_arg_type):
-                                            raise TypeError('Mismatched argument type. Expecting {type1}, but recevied {type2}.'.format(type1=inner_arg_type, type2=type(inner_arg)))
+                                            raise TypeError(f'Mismatched argument type. Expecting {inner_arg_type}, but recevied {type(inner_arg)}.')
                                     elif inner_arg_type == callable:
                                         if not callable(inner_arg):
-                                            raise TypeError('Mismatched argument type. Expecting function or method, but recevied {type}.'.format(type=type(inner_arg)))
+                                            raise TypeError(f'Mismatched argument type. Expecting function or method, but recevied {type(inner_arg)}.')
                                     elif not isinstance(inner_arg, inner_arg_type):
-                                        raise TypeError('Mismatched argument type. Expecting one of {type1}, but recevied {type2}.'.format(type1=inner_arg_type, type2=inner_arg))
+                                        raise TypeError(f'Mismatched argument type. Expecting one of {inner_arg_type}, but recevied {inner_arg}.')
                     elif isinstance(arg_type, list):
                         if not isinstance(arg, list):
-                            raise TypeError('Mismatched argument type. Expecting {type1}, but recevied {type2}.'.format(type1=list, type2=arg))
+                            raise TypeError(f'Mismatched argument type. Expecting {list}, but recevied {arg}.')
                         for inner_arg in arg:
                             for inner_arg_type in arg_type:
                                 if isinstance(inner_arg_type, OneOfType):
                                     oneOfType = inner_arg_type
                                     if not oneOfType.is_matched(inner_arg):
-                                        raise TypeError('Mismatched argument type. Expecting one of {type1}, but recevied {type2}.'.format(type1=oneOfType.arg_types, type2=type(inner_arg)))
+                                        raise TypeError(f'Mismatched argument type. Expecting one of {oneOfType.arg_types}, but recevied {inner_arg}.')
                                 else:
                                     if isinstance(inner_arg_type, type) and isinstance(type(inner_arg), type) and not issubclass(type(inner_arg), inner_arg_type):
                                         if not isinstance(type(inner_arg), inner_arg_type):
-                                            raise TypeError('Mismatched argument type. Expecting {type1}, but recevied {type2}.'.format(type1=inner_arg_type, type2=type(inner_arg)))
+                                            raise TypeError(f'Mismatched argument type. Expecting {inner_arg_type}, but recevied {inner_arg}.')
                                     elif inner_arg_type == callable:
                                         if not callable(inner_arg):
-                                            raise TypeError('Mismatched argument type. Expecting function or method, but recevied {type}.'.format(type(type=inner_arg)))
+                                            raise TypeError(f'Mismatched argument type. Expecting function or method, but recevied {type(inner_arg)}.')
                                     elif not isinstance(inner_arg, inner_arg_type):
-                                        raise TypeError('Mismatched argument type. Expecting one of {type1}, but recevied {type2}.'.format(type1=inner_arg_type, type2=inner_arg))
+                                        raise TypeError(f'Mismatched argument type. Expecting one of {inner_arg_type}, but recevied {inner_arg}.')
                     elif isinstance(arg_type, type) and isinstance(type(arg), type) and not issubclass(type(arg), arg_type):
                         if not isinstance(type(arg), arg_type):
-                            raise TypeError('Mismatched argument type. Expecting {type1}, but recevied {type2}.'.format(type1=arg_type, type2=type(arg)))
+                            raise TypeError(f'Mismatched argument type. Expecting {arg_type}, but recevied {type(arg)}.')
                     elif isinstance(arg_type, OneOfType):
                         oneOfType = arg_type
                         if not oneOfType.is_matched(arg):
-                            raise TypeError('Mismatched argument type. Expecting one of {type1}, but recevied {type2}.'.format(type1=oneOfType.arg_types, type2=type(arg)))
+                            raise TypeError(f'Mismatched argument type. Expecting one of {oneOfType.arg_types}, but recevied {type(arg)}.')
                     elif arg_type == callable:
                         if not callable(arg):
-                            raise TypeError('Mismatched argument type. Expecting function or method, but recevied {type}.'.format(type(type=arg)))
+                            raise TypeError(f'Mismatched argument type. Expecting function or method, but recevied {type(arg)}.')
                     else:
                         if not isinstance(arg, arg_type):
-                            raise TypeError('Mismatched argument type. Expecting {type1}, but recevied {type2}.'.format(type1=arg_type, type2=type(arg)))
+                            raise TypeError(f'Mismatched argument type. Expecting {arg_type}, but recevied {type(arg)}.')
             if kwargs_len > 0:
                 for (kwarg_key, kwarg) in kwargs.items():
                     if kwarg_key in self._kwarg_types:
                         kwarg_type = self._kwarg_types[kwarg_key]
                         if isinstance(kwarg_type, tuple):
                             if not isinstance(kwarg, tuple):
-                                raise TypeError('Mismatched argument type. Expecting {type1}, but recevied {type2}.'.format(type1=tuple, type2=kwarg))
+                                raise TypeError(f'Mismatched argument type. Expecting {tuple}, but recevied {kwarg}.')
                             for inner_kwarg in kwarg:
                                 for inner_kwarg_type in kwarg_type:
                                     if isinstance(inner_kwarg_type, OneOfType):
                                         oneOfType = inner_kwarg_type
                                         if not oneOfType.is_matched(inner_kwarg):
-                                            raise TypeError('Mismatched argument type. Expecting one of {type1}, but recevied {type2}.'.format(type1=oneOfType.arg_types, type2=type(inner_kwarg)))
+                                            raise TypeError(f'Mismatched argument type. Expecting one of {oneOfType.arg_types}, but recevied {type(inner_kwarg)}.')
                                     else:
                                         if isinstance(inner_kwarg_type, type) and isinstance(type(inner_kwarg), type) and not issubclass(type(inner_kwarg), inner_kwarg_type):
                                             if not isinstance(type(inner_kwarg), inner_kwarg_type):
-                                                raise TypeError('Mismatched argument type. Expecting {type1}, but recevied {type2}.'.format(type1=inner_kwarg, type2=type(inner_kwarg)))
+                                                raise TypeError(f'Mismatched argument type. Expecting {inner_kwarg}, but recevied {type(inner_kwarg)}.')
                                         elif inner_kwarg_type == callable:
                                             if not callable(inner_kwarg):
-                                                raise TypeError('Mismatched argument type. Expecting function or method, but recevied {type}.'.format(type(type=inner_kwarg)))
+                                                raise TypeError(f'Mismatched argument type. Expecting function or method, but recevied {type(inner_kwarg)}.')
                                         elif not isinstance(inner_kwarg, inner_kwarg_type):
-                                            raise TypeError('Mismatched argument type. Expecting one of {type1}, but recevied {type2}.'.format(type1=inner_kwarg_type, type2=inner_kwarg))
+                                            raise TypeError(f'Mismatched argument type. Expecting one of {inner_kwarg_type}, but recevied {inner_kwarg}.')
                         elif isinstance(kwarg_type, list):
                             if not isinstance(kwarg, list):
-                                raise TypeError('Mismatched argument type. Expecting {type1}, but recevied {type2}.'.format(type1=list, type2=kwarg))
+                                raise TypeError(f'Mismatched argument type. Expecting {list}, but recevied {kwarg}.')
                             for inner_kwarg in kwarg:
                                 for inner_kwarg_type in kwarg_type:
                                     if isinstance(inner_kwarg_type, OneOfType):
                                         oneOfType = inner_kwarg_type
                                         if not oneOfType.is_matched(inner_kwarg):
-                                            raise TypeError('Mismatched argument type. Expecting one of {type1}, but recevied {type2}.'.format(type1=oneOfType.arg_types, type2=type(inner_kwarg)))
+                                            raise TypeError(f'Mismatched argument type. Expecting one of {oneOfType.arg_types}, but recevied {type(inner_kwarg)}.')
                                     else:
                                         if isinstance(inner_kwarg_type, type) and isinstance(type(inner_kwarg), type) and not issubclass(type(inner_kwarg), inner_kwarg_type):
                                             if not isinstance(type(inner_kwarg), inner_kwarg_type):
-                                                raise TypeError('Mismatched argument type. Expecting {type1}, but recevied {type2}.'.format(type1=inner_kwarg, type2=type(inner_kwarg)))
+                                                raise TypeError(f'Mismatched argument type. Expecting {inner_kwarg}, but recevied {type(inner_kwarg)}.')
                                         elif inner_kwarg_type == callable:
                                             if not callable(inner_kwarg):
-                                                raise TypeError('Mismatched argument type. Expecting function or method, but recevied {type}.'.format(type(type=inner_kwarg)))
+                                                raise TypeError(f'Mismatched argument type. Expecting function or method, but recevied {type(inner_kwarg)}.')
                                         elif not isinstance(inner_kwarg, inner_kwarg_type):
-                                            raise TypeError('Mismatched argument type. Expecting one of {type1}, but recevied {type2}.'.format(type1=inner_kwarg_type, type2=inner_kwarg))
+                                            raise TypeError(f'Mismatched argument type. Expecting one of {inner_kwarg_type}, but recevied {inner_kwarg}.')
                         elif isinstance(kwarg_type, type) and isinstance(type(kwarg), type) and not issubclass(type(kwarg), kwarg_type):
                             if not isinstance(type(kwarg), kwarg_type):
-                                raise TypeError('Mismatched argument type. Expecting {type1}, but recevied {type2}.'.format(type1=kwarg_type, type2=type(kwarg)))
+                                raise TypeError(f'Mismatched argument type. Expecting {kwarg_type}, but recevied {type(kwarg)}.')
                         elif isinstance(kwarg_type, OneOfType):
                             oneOfType = kwarg_type
                             if not oneOfType.is_matched(kwarg):
-                                raise TypeError('Mismatched argument type. Expecting one of {type1}, but recevied {type2}.'.format(type1=oneOfType.arg_types, type2=type(kwarg)))
+                                raise TypeError(f'Mismatched argument type. Expecting one of {oneOfType.arg_types}, but recevied {type(kwarg)}.')
                         elif kwarg_type == callable:
                             if not callable(kwarg):
-                                raise TypeError('Mismatched argument type. Expecting function or method, but recevied {type}.'.format(type(kwarg)))
+                                raise TypeError(f'Mismatched argument type. Expecting function or method, but recevied {type(kwarg)}.')
                         else:
                             if not isinstance(kwarg, kwarg_type):
-                                raise TypeError('Mismatched argument type. Expecting {type1}, but recevied {type2}.'.format(type1=kwarg_type, type2=type(kwarg)))
+                                raise TypeError(f'Mismatched argument type. Expecting {kwarg_type}, but recevied {type(kwarg)}.')
 
             return decorated_method(*args, **kwargs)
         return decorator
@@ -294,116 +289,111 @@ class MType(object, metaclass=Validator):
             kwarg_types_len = len(self._kwarg_types)
 
             if (arg_types_len + kwarg_types_len) < (args_len + kwargs_len):
-                raise TypeError(
-                    'Mismatched number of arguments and argument validation types. Expecting {len1} or less, but recevied {len2}.'.format(
-                        len1=arg_types_len,
-                        len2=args_len + kwargs_len
-                    )
-                )
+                raise TypeError(f'Mismatched number of arguments and argument validation types. Expecting {arg_types_len} or less, but recevied {args_len + kwargs_len}.')
             if args_len > 0:
                 for (arg, arg_type) in zip(args, self._arg_types):
                     if isinstance(arg_type, tuple):
                         if not isinstance(arg, tuple):
-                            raise TypeError('Mismatched argument type. Expecting {type1}, but recevied {type2}.'.format(type1=tuple, type2=arg))
+                            raise TypeError(f'Mismatched argument type. Expecting {tuple}, but recevied {arg}.')
                         for inner_arg in arg:
                             for inner_arg_type in arg_type:
                                 if isinstance(inner_arg_type, OneOfType):
                                     oneOfType = inner_arg_type
                                     if not oneOfType.is_matched(inner_arg):
-                                        raise TypeError('Mismatched argument type. Expecting one of {type1}, but recevied {type2}.'.format(type1=oneOfType.arg_types, type2=type(inner_arg)))
+                                        raise TypeError(f'Mismatched argument type. Expecting one of {oneOfType.arg_types}, but recevied {type(inner_arg)}.')
                                 else:
                                     if isinstance(inner_arg_type, type) and isinstance(type(inner_arg), type) and not issubclass(type(inner_arg), inner_arg_type):
                                         if not isinstance(type(inner_arg), inner_arg_type):
-                                            raise TypeError('Mismatched argument type. Expecting {type1}, but recevied {type2}.'.format(type1=inner_arg_type, type2=type(inner_arg)))
+                                            raise TypeError(f'Mismatched argument type. Expecting {inner_arg_type}, but recevied {type(inner_arg)}.')
                                     elif inner_arg_type == callable:
                                         if not callable(inner_arg):
-                                            raise TypeError('Mismatched argument type. Expecting function or method, but recevied {type}.'.format(type=type(inner_arg)))
+                                            raise TypeError(f'Mismatched argument type. Expecting function or method, but recevied {type(inner_arg)}.')
                                     elif not isinstance(inner_arg, inner_arg_type):
-                                        raise TypeError('Mismatched argument type. Expecting one of {type1}, but recevied {type2}.'.format(type1=inner_arg_type, type2=inner_arg))
+                                        raise TypeError(f'Mismatched argument type. Expecting one of {inner_arg_type}, but recevied {inner_arg}.')
                     elif isinstance(arg_type, list):
                         if not isinstance(arg, list):
-                            raise TypeError('Mismatched argument type. Expecting {type1}, but recevied {type2}.'.format(type1=list, type2=arg))
+                            raise TypeError(f'Mismatched argument type. Expecting {list}, but recevied {arg}.')
                         for inner_arg in arg:
                             for inner_arg_type in arg_type:
                                 if isinstance(inner_arg_type, OneOfType):
                                     oneOfType = inner_arg_type
                                     if not oneOfType.is_matched(inner_arg):
-                                        raise TypeError('Mismatched argument type. Expecting one of {type1}, but recevied {type2}.'.format(type1=oneOfType.arg_types, type2=type(inner_arg)))
+                                        raise TypeError(f'Mismatched argument type. Expecting one of {oneOfType.arg_types}, but recevied {type(inner_arg)}.')
                                 else:
                                     if isinstance(inner_arg_type, type) and isinstance(type(inner_arg), type) and not issubclass(type(inner_arg), inner_arg_type):
                                         if not isinstance(type(inner_arg), inner_arg_type):
-                                            raise TypeError('Mismatched argument type. Expecting {type1}, but recevied {type2}.'.format(type1=inner_arg_type, type2=type(inner_arg)))
+                                            raise TypeError(f'Mismatched argument type. Expecting {inner_arg_type}, but recevied {type(inner_arg)}.')
                                     elif inner_arg_type == callable:
                                         if not callable(inner_arg):
-                                            raise TypeError('Mismatched argument type. Expecting function or method, but recevied {type}.'.format(type=type(inner_arg)))
+                                            raise TypeError(f'Mismatched argument type. Expecting function or method, but recevied {type(inner_arg)}.')
                                     elif not isinstance(inner_arg, inner_arg_type):
-                                        raise TypeError('Mismatched argument type. Expecting one of {type1}, but recevied {type2}.'.format(type1=inner_arg_type, type2=inner_arg))
+                                        raise TypeError(f'Mismatched argument type. Expecting one of {inner_arg_type}, but recevied {inner_arg}.')
                     elif isinstance(arg_type, type) and isinstance(type(arg), type) and not issubclass(type(arg), arg_type):
                         if not isinstance(type(arg), arg_type):
-                            raise TypeError('Mismatched argument type. Expecting {type1}, but recevied {type2}.'.format(type1=arg_type, type2=type(arg)))
+                            raise TypeError(f'Mismatched argument type. Expecting {arg_type}, but recevied {type(arg)}.')
                     elif isinstance(arg_type, OneOfType):
                         oneOfType = arg_type
                         if not oneOfType.is_matched(arg):
-                            raise TypeError('Mismatched argument type. Expecting one of {type1}, but recevied {type2}.'.format(type1=oneOfType.arg_types, type2=type(arg)))
+                            raise TypeError(f'Mismatched argument type. Expecting one of {oneOfType.arg_types}, but recevied {type(arg)}.')
                     elif arg_type == callable:
                         if not callable(arg):
-                            raise TypeError('Mismatched argument type. Expecting function or method, but recevied {type}.'.format(type=type(arg)))
+                            raise TypeError(f'Mismatched argument type. Expecting function or method, but recevied {type(arg)}.')
                     else:
                         if not isinstance(arg, arg_type):
-                            raise TypeError('Mismatched argument type. Expecting {type1}, but recevied {type2}.'.format(type1=arg_type, type2=type(arg)))
+                            raise TypeError(f'Mismatched argument type. Expecting {arg_type}, but recevied {type(arg)}.')
             if kwargs_len > 0:
                 for (kwarg_key, kwarg) in kwargs.items():
                     if kwarg_key in self._kwarg_types:
                         kwarg_type = self._kwarg_types[kwarg_key]
                         if isinstance(kwarg_type, tuple):
                             if not isinstance(kwarg, tuple):
-                                raise TypeError('Mismatched argument type. Expecting {type1}, but recevied {type2}.'.format(type1=tuple, type2=kwarg))
+                                raise TypeError(f'Mismatched argument type. Expecting {tuple}, but recevied {kwarg}.')
                             for inner_kwarg in kwarg:
                                 for inner_kwarg_type in kwarg_type:
                                     if isinstance(inner_kwarg_type, OneOfType):
                                         oneOfType = inner_kwarg_type
                                         if not oneOfType.is_matched(inner_kwarg):
-                                            raise TypeError('Mismatched argument type. Expecting one of {type1}, but recevied {type2}.'.format(type1=oneOfType.arg_types, type2=type(inner_kwarg)))
+                                            raise TypeError(f'Mismatched argument type. Expecting one of {oneOfType.arg_types}, but recevied {type(inner_kwarg)}.')
                                     else:
                                         if isinstance(inner_kwarg_type, type) and isinstance(type(inner_kwarg), type) and not issubclass(type(inner_kwarg), inner_kwarg_type):
                                             if not isinstance(type(inner_kwarg), inner_kwarg_type):
-                                                raise TypeError('Mismatched argument type. Expecting {type1}, but recevied {type2}.'.format(type1=inner_kwarg, type2=type(inner_kwarg)))
+                                                raise TypeError(f'Mismatched argument type. Expecting {inner_kwarg}, but recevied {type(inner_kwarg)}.')
                                         elif inner_kwarg_type == callable:
                                             if not callable(inner_kwarg):
-                                                raise TypeError('Mismatched argument type. Expecting function or method, but recevied {type}.'.format(type(type=inner_kwarg)))
+                                                raise TypeError(f'Mismatched argument type. Expecting function or method, but recevied {inner_kwarg}.')
                                         elif not isinstance(inner_kwarg, inner_kwarg_type):
-                                            raise TypeError('Mismatched argument type. Expecting one of {type1}, but recevied {type2}.'.format(type1=inner_kwarg_type, type2=inner_kwarg))
+                                            raise TypeError(f'Mismatched argument type. Expecting one of {inner_kwarg_type}, but recevied {inner_kwarg}.')
                         elif isinstance(kwarg_type, list):
                             if not isinstance(kwarg, list):
-                                raise TypeError('Mismatched argument type. Expecting {type1}, but recevied {type2}.'.format(type1=list, type2=kwarg))
+                                raise TypeError(f'Mismatched argument type. Expecting {list}, but recevied {kwarg}.')
                             for inner_kwarg in kwarg:
                                 for inner_kwarg_type in kwarg_type:
                                     if isinstance(inner_kwarg_type, OneOfType):
                                         oneOfType = inner_kwarg_type
                                         if not oneOfType.is_matched(inner_kwarg):
-                                            raise TypeError('Mismatched argument type. Expecting one of {type1}, but recevied {type2}.'.format(type1=oneOfType.arg_types, type2=type(inner_kwarg)))
+                                            raise TypeError(f'Mismatched argument type. Expecting one of {oneOfType.arg_types}, but recevied {type(inner_kwarg)}.')
                                     else:
                                         if isinstance(inner_kwarg_type, type) and isinstance(type(inner_kwarg), type) and not issubclass(type(inner_kwarg), inner_kwarg_type):
                                             if not isinstance(type(inner_kwarg), inner_kwarg_type):
-                                                raise TypeError('Mismatched argument type. Expecting {type1}, but recevied {type2}.'.format(type1=inner_kwarg, type2=type(inner_kwarg)))
+                                                raise TypeError(f'Mismatched argument type. Expecting {inner_kwarg}, but recevied {type(inner_kwarg)}.')
                                         elif inner_kwarg_type == callable:
                                             if not callable(inner_kwarg):
-                                                raise TypeError('Mismatched argument type. Expecting function or method, but recevied {type}.'.format(type(type=inner_kwarg)))
+                                                raise TypeError(f'Mismatched argument type. Expecting function or method, but recevied {type(inner_kwarg)}.')
                                         elif not isinstance(inner_kwarg, inner_kwarg_type):
-                                            raise TypeError('Mismatched argument type. Expecting one of {type1}, but recevied {type2}.'.format(type1=inner_kwarg_type, type2=inner_kwarg))
+                                            raise TypeError(f'Mismatched argument type. Expecting one of {inner_kwarg_type}, but recevied {inner_kwarg}.')
                         elif isinstance(kwarg_type, type) and isinstance(type(kwarg), type) and not issubclass(type(kwarg), kwarg_type):
                             if not isinstance(type(kwarg), kwarg_type):
-                                raise TypeError('Mismatched argument type. Expecting {type1}, but recevied {type2}.'.format(type1=kwarg_type, type2=type(kwarg)))
+                                raise TypeError(f'Mismatched argument type. Expecting {kwarg_type}, but recevied {type(kwarg)}.')
                         elif isinstance(kwarg_type, OneOfType):
                             oneOfType = kwarg_type
                             if not oneOfType.is_matched(kwarg):
-                                raise TypeError('Mismatched argument type. Expecting one of {type1}, but recevied {type2}.'.format(type1=oneOfType.arg_types, type2=type(kwarg)))
+                                raise TypeError(f'Mismatched argument type. Expecting one of {oneOfType.arg_types}, but recevied {type(kwarg)}.')
                         elif kwarg_type == callable:
                             if not callable(kwarg):
-                                raise TypeError('Mismatched argument type. Expecting function or method, but recevied {type}.'.format(type=type(kwarg)))
+                                raise TypeError(f'Mismatched argument type. Expecting function or method, but recevied {type(kwarg)}.')
                         else:
                             if not isinstance(kwarg, kwarg_type):
-                                raise TypeError('Mismatched argument type. Expecting {type1}, but recevied {type2}.'.format(type1=kwarg_type, type2=type(kwarg)))
+                                raise TypeError(f'Mismatched argument type. Expecting {kwarg_type}, but recevied {type(kwarg)}.')
 
             return decorated_method(*(arg_self, *args), **kwargs)
         return decorator
@@ -419,7 +409,7 @@ class MShape(object, metaclass=Validator):
     @MType(axis=int, transpose=bool)
     def __init__(self, *, axis=2, transpose=False):
         if axis < -1:
-            raise ValueError('Invalid axis {axis}'.format(axis=axis))
+            raise ValueError(f'Invalid axis {axis}')
         else:
             self._axis = axis
             self._transpose = transpose
@@ -440,7 +430,7 @@ class MShape(object, metaclass=Validator):
             args = args[1:]
             ref_shape = getattr(arg_self, 'shape', None)
             if ref_shape is None:
-                raise TypeError('Missing shape attribute in {arg_self}'.format(arg_self=arg_self))
+                raise TypeError(f'Missing shape attribute in {arg_self}')
             else:
                 if self._transpose:
                     ref_shape = tuple(reversed(ref_shape))
@@ -451,10 +441,10 @@ class MShape(object, metaclass=Validator):
                             shape = (1,) + shape[1:]
                         if self._axis == -1:
                             if ref_shape != shape:
-                                raise TypeError('Mismatched tensor shape. Expecting {shape1}, but recevied {shape2}.'.format(shape1=ref_shape, shape2=shape))
+                                raise TypeError(f'Mismatched tensor shape. Expecting {ref_shape}, but recevied {shape}.')
                         else:
                             if ref_shape[self._axis] != shape[self._axis]:
-                                raise TypeError('Mismatched tensor shape. Expecting {shape1}, but recevied {shape2}.'.format(shape1=ref_shape, shape2=shape))
+                                raise TypeError(f'Mismatched tensor shape. Expecting {ref_shape}, but recevied {shape}.')
                 for kwarg in kwargs.values():
                     shape = getattr(kwarg, 'shape', None)
                     if shape is not None:
@@ -462,12 +452,12 @@ class MShape(object, metaclass=Validator):
                             shape = (1,) + shape[1:]
                         if self._axis == 2:
                             if ref_shape != shape:
-                                raise TypeError('Mismatched tensor shape. Expecting {shape1}, but recevied {shape2}.'.format(shape1=ref_shape, shape2=shape))
+                                raise TypeError(f'Mismatched tensor shape. Expecting {ref_shape}, but recevied {shape}.')
                         elif self._axis == 1:
                             if ref_shape[1] != shape[1]:
-                                raise TypeError('Mismatched tensor column shape. Expecting {shape1}, but recevied {shape2}.'.format(shape1=ref_shape, shape2=shape))
+                                raise TypeError(f'Mismatched tensor column shape. Expecting {ref_shape}, but recevied {shape}.')
                         elif self._axis == 0:
                             if ref_shape[0] != shape[0]:
-                                raise TypeError('Mismatched tensor row shape. Expecting {shape1}, but recevied {shape2}.'.format(shape1=ref_shape, shape2=shape))
+                                raise TypeError(f'Mismatched tensor row shape. Expecting {ref_shape}, but recevied {shape}.')
                 return decorated_method(*(arg_self, *args), **kwargs)
         return decorator
