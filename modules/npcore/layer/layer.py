@@ -349,13 +349,13 @@ class Layer(object, metaclass=Layer):
         """
         if shape is not None:
             if not all(axis >= 1 for axis in shape):
-                raise ValueError('Shape {shape} has axis < 1.'.format(shape=shape))
+                raise ValueError(f'Shape {shape} has axis < 1.')
             if len(shape) < 2:
                 raise ValueError('Shape must have atleast 2 axes.')
             if self.is_locked:
-                warnings.warn('Layer {name} is locked. Reconfig layer shape skipped.'.format(name=self.name), UserWarning)
+                warnings.warn(f'Layer {self.name} is locked. Reconfig layer shape skipped.', UserWarning)
             if not self.is_singular:
-                warnings.warn('Layer {name} has connection to other layers. Reconfig layer shape skipped.'.format(name=self.name), UserWarning)
+                warnings.warn(f'Layer {self.name} has connection to other layers. Reconfig layer shape skipped.', UserWarning)
             self._shape = shape
         self.reset()
 
@@ -407,9 +407,7 @@ class Layer(object, metaclass=Layer):
                 target_index += 1
             layer = layer.next
         if layer is None:
-            warnings.warn(
-                'No layer is found at index {index}.'.format(index=index),
-                UserWarning)
+            warnings.warn(f'No layer is found at index {index}.', UserWarning)
         return layer
 
     @MType(Layer, position=str)
@@ -423,22 +421,20 @@ class Layer(object, metaclass=Layer):
             layer
         """
         if self.is_locked:
-            warnings.warn('Cannot make connection from locked layer {name1} to layer {name2}. Connecting layer skipped.'.format(name1=self.name, name2=layer.name), UserWarning)
+            warnings.warn(f'Cannot make connection from locked layer {self.name} to layer {layer.name}. Connecting layer skipped.', UserWarning)
             return self
         elif layer.is_connected_to(self):
-            warnings.warn(
-                'Layer {name1} is already connected to {name2}.'.format(name1=layer.name, name2=self.name),
-                UserWarning)
+            warnings.warn(f'Layer {layer.name} is already connected to {self.name}.', UserWarning)
             return self
         else:
             if position == 'ahead':
                 if not self.is_singular and (self.is_head or self.is_body):
                     if not layer.is_singular:
-                        raise RuntimeError('Cannot make connection from layer {name1} to a non-singular layer {name2}. '.format(name1=self.name, name2=layer.name))
+                        raise RuntimeError(f'Cannot make connection from layer {self.name} to a non-singular layer {layer.name}.')
                     if layer.arrangement[0] not in self.arrangement[1]:
-                        raise RuntimeError('Cannot make connection from layer {name1} to layer {name2}. Mismatched arrangement.'.format(name1=self.name, name2=layer.name))
+                        raise RuntimeError(f'Cannot make connection from layer {self.name} to layer {layer.name}. Mismatched arrangement.')
                     if layer.arrangement[1] not in self._next.arrangement[0]:
-                        raise RuntimeError('Cannot make connection from layer {name1} to layer {name2}. Mismatched arrangement.'.format(name1=layer.name, name2=self._next.name))
+                        raise RuntimeError(f'Cannot make connection from layer {layer.name} to layer {self._next.name}. Mismatched arrangement.')
                     self._next._prev = layer
                     layer._next = self._next
                     layer._prev = self
@@ -446,33 +442,33 @@ class Layer(object, metaclass=Layer):
                     return layer
                 elif self.is_singular or self.is_tail:
                     if layer.is_body or (layer.is_tail and layer.has_prev):
-                        raise RuntimeError('Cannot make connection from layer {name1} to a non-signular layer {name2} that is either a body or tail. '.format(name1=self.name, name2=layer.name))
+                        raise RuntimeError(f'Cannot make connection from layer {self.name} to a non-signular layer {layer.name} that is either a body or tail.')
                     if layer.arrangement[0] not in self.arrangement[1]:
-                        raise RuntimeError('Cannot make connection from layer {name1} to layer {name2}. Mismatched arrangement.'.format(name1=self.name, name2=layer.name))
+                        raise RuntimeError(f'Cannot make connection from layer {self.name} to layer {layer.name}. Mismatched arrangement.')
                     self._next = layer
                     layer._prev = self
                     return layer
             elif position == 'behind':
                 if not layer.is_singular:
-                    raise RuntimeError('Cannot make connection from layer {name1} to a non-singular layer {name2}. '.format(name1=self.name, name2=layer.name))
+                    raise RuntimeError(f'Cannot make connection from layer {self.name} to a non-singular layer {layer.name}.')
                 if self.is_singular or self.is_head:
                     if self.arrangement[0] not in layer.arrangement[1]:
-                        raise RuntimeError('Cannot make connection from layer {name} to layer{name}. Mismatched arrangement.'.format(name1=layer.name, name2=self.name))
+                        raise RuntimeError(f'Cannot make connection from layer {layer.name} to layer{self.name}. Mismatched arrangement.')
                     self._prev = layer
                     layer._next = self
                     return layer
                 elif self.is_body or (not self.is_singular and self.is_tail):
                     if self.arrangement[0] not in layer.arrangement[1]:
-                        raise RuntimeError('Cannot make connection from layer {name1} to layer {name2}. Mismatched arrangement.'.format(name1=layer.name, name2=self.name))
+                        raise RuntimeError(f'Cannot make connection from layer {layer.name} to layer {self.name}. Mismatched arrangement.')
                     if layer.arrangement[0] not in self._prev.arrangement[1]:
-                        raise RuntimeError('Cannot make connection from layer {name1} to layer {name2}. Mismatched arrangement.'.format(name1=self._prev.name, name2=layer.name))
+                        raise RuntimeError(f'Cannot make connection from layer {self._prev.name} to layer {layer.name}. Mismatched arrangement.')
                     self._prev._next = layer
                     layer._prev = self._prev
                     layer._next = self
                     self._prev = layer
                     return layer
             else:
-                raise TypeError('Unknown position type {position}.'.format(position=position))
+                raise TypeError(f'Unknown position type {position}.')
 
     @MType(Layer)
     def replace_with(self, layer):
@@ -484,29 +480,27 @@ class Layer(object, metaclass=Layer):
             layer
         """
         if self.is_locked:
-            warnings.warn('Cannot replace locked layer {name1} with layer {name2}. Replace layer skipped.'.format(name1=self.name, name2=layer.name), UserWarning)
+            warnings.warn(f'Cannot replace locked layer {self.name} with layer {layer.name}. Replace layer skipped.', UserWarning)
             return self
         elif layer.is_connected_to(self):
-            warnings.warn(
-                'Layer {name1} is already connected to {name2}.'.format(name1=layer.name, name2=self.name),
-                UserWarning)
+            warnings.warn(f'Layer {layer.name} is already connected to {self.name}.', UserWarning)
             return self
         else:
             if not layer.is_singular:
-                raise RuntimeError('Cannot make connection from layer {name1} to non-singular layer {name2}. '.format(name1=self.name, name2=layer.name))
+                raise RuntimeError(f'Cannot make connection from layer {self.name} to non-singular layer {layer.name}.')
             if self.is_singular:
-                raise RuntimeError('Cannot replace a non-connecting layer {name1} with layer {name2}.'.format(name1=self.name, name2=layer.name))
+                raise RuntimeError(f'Cannot replace a non-connecting layer {self.name} with layer {layer.name}.')
             if self.is_head:
                 if self._next.arrangement[0] not in layer.arrangement[1]:
-                    raise RuntimeError('Cannot make connection from layer {name1} to layer {name2}. Mismatched arrangement.'.format(name1=layer.name, name2=self._next.name))
+                    raise RuntimeError(f'Cannot make connection from layer {layer.name} to layer {self._next.name}. Mismatched arrangement.')
                 self._next._prev = layer
                 layer._next = self._next
                 self._next = None
             elif self.is_body:
                 if self._next.arrangement[0] not in layer.arrangement[1]:
-                    raise RuntimeError('Cannot make connection from layer {name1} to layer {name2}. Mismatched arrangement.'.format(name1=self._next.name, name2=layer.name))
+                    raise RuntimeError(f'Cannot make connection from layer {self._next.name} to layer {layer.name}. Mismatched arrangement.')
                 if layer.arrangement[0] not in self._prev.arrangement[1]:
-                    raise RuntimeError('Cannot make connection from layer {name1} to layer {name2}. Mismatched arrangement.'.format(name1=layer.name, name2=self._prev.name))
+                    raise RuntimeError(f'Cannot make connection from layer {layer.name} to layer {self._prev.name}. Mismatched arrangement.')
                 self._next._prev = layer
                 self._prev._next = layer
                 layer._next = self._next
@@ -515,7 +509,7 @@ class Layer(object, metaclass=Layer):
                 self._prev = None
             elif self.is_tail:
                 if layer.arrangement[0] not in self._prev.arrangement[1]:
-                    raise RuntimeError('Cannot make connection from layer {name1} to layer {name2}. Mismatched arrangement.'.format(name1=self._prev.name, name2=layer.name))
+                    raise RuntimeError(f'Cannot make connection from layer {self._prev.name} to layer {layer.name}. Mismatched arrangement.')
                 self._prev._next = layer
                 layer._prev = self._prev
                 self._prev = None
@@ -528,20 +522,20 @@ class Layer(object, metaclass=Layer):
             layer
         """
         if self.is_locked:
-            warnings.warn('Cannot remove locked layer {name}. Remove layer skipped.'.format(name=self.name), UserWarning)
+            warnings.warn(f'Cannot remove locked layer {self.name}. Remove layer skipped.', UserWarning)
             return self
         else:
             if self.is_head:
                 self._next._prev = None
             elif self.is_body:
                 if self._next.arrangement[0] not in self._prev.arrangement[1]:
-                    raise RuntimeError('Cannot make connection from layer {name1} to layer {name2}. Mismatched arrangement.'.format(name1=self._prev.name, name2=self._next.name))
+                    raise RuntimeError(f'Cannot make connection from layer {self._prev.name} to layer {self._next.name}. Mismatched arrangement.')
                 self._next._prev = self._prev
                 self._prev._next = self._next
             elif self.is_tail:
                 self._prev._next = None
             else:
-                raise RuntimeError('Cannot remove a non-connecting layer {name}. '.format(name=self.name))
+                raise RuntimeError(f'Cannot remove a non-connecting layer {self.name}.')
             self._next = None
             self._prev = None
             return self

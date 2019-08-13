@@ -170,7 +170,7 @@ class Objective(Layer):
             if 'loss' in metric:
                 self._evaluation['metric']['loss'] = 0
             else:
-                raise TypeError('Unknown metric {metric} for objective {name}.'.format(metric=metric, name=self.name))
+                raise TypeError(f'Unknown metric {metric} for objective {self.name}.')
         if shape is not None:
             super().reconfig(shape=shape)
         self.reset()
@@ -225,9 +225,7 @@ class Objective(Layer):
             self._monitor(report)
 
         if self.has_next:
-            warnings.warn(
-                'Objective {name} layer must be the last in connection. There should be no connection to next layer.'.format(name=self.name),
-                UserWarning)
+            warnings.warn(f'Objective {self.name} layer must be the last in connection. There should be no connection to next layer.', UserWarning)
         return self
 
     @MType(np.ndarray)
@@ -262,14 +260,10 @@ class Objective(Layer):
             layer
         """
         if self._y_t is None:
-            warnings.warn(
-                'Objective {name} cannot do backward pass. Need to run forward pass first.'.format(name=self.name),
-                UserWarning)
+            warnings.warn(f'Objective {self.name} cannot do backward pass. Need to run forward pass first.', UserWarning)
             return self
         elif self._y_prime_t is None:
-            warnings.warn(
-                'Objective {name} cannot do backward pass. Need to run evaluation first.'.format(name=self.name),
-                UserWarning)
+            warnings.warn(f'Objective {self.name} cannot do backward pass. Need to run evaluation first.', UserWarning)
             return self
         else:
             hparam = stage['hparam']
@@ -294,9 +288,7 @@ class Objective(Layer):
             if self.has_prev:
                 return self.prev.backward(stage, eyg_t, residue=residue)
             else:
-                warnings.warn(
-                    'Objective {name} connection is incomplete. Missing connection to previous layer.'.format(name=self.name),
-                    UserWarning)
+                warnings.warn(f'Objective {self.name} connection is incomplete. Missing connection to previous layer.', UserWarning)
                 return self
 
     @abc.abstractmethod
@@ -350,11 +342,9 @@ class MAELoss(Objective):
                ('recall' or 'rc') in metric or \
                ('precision' or 'prec') in metric or \
                ('f1_score' or 'f1') in metric:
-                warnings.warn(
-                    'Mean absolute error objective only have loss metric. Ignoring metrics {metric}'.format(metric=metric),
-                    UserWarning)
+                warnings.warn(f'Mean absolute error objective only have loss metric. Ignoring metrics {metric}', UserWarning)
             else:
-                raise TypeError('Unknown metric {metric} for objective {name}.'.format(metric=metric, name=self.name))
+                raise TypeError(f'Unknown metric {metric} for objective {self.name}.')
         if shape is not None:
             super().reconfig(shape=shape)
         self.reset()
@@ -434,11 +424,9 @@ class MSELoss(Objective):
                ('recall' or 'rc') in metric or \
                ('precision' or 'prec') in metric or \
                ('f1_score' or 'f1') in metric:
-                warnings.warn(
-                    'Mean square error objective only have loss metric. Ignoring metrics {metric}'.format(metric=metric),
-                    UserWarning)
+                warnings.warn(f'Mean square error objective only have loss metric. Ignoring metrics {metric}', UserWarning)
             else:
-                raise TypeError('Unknown metric {metric} for objective {name}.'.format(metric=metric, name=self.name))
+                raise TypeError(f'Unknown metric {metric} for objective {self.name}.')
         if shape is not None:
             super().reconfig(shape=shape)
         self.reset()
@@ -525,11 +513,9 @@ class LogCoshLoss(Objective):
                    ('recall' or 'rc') in metric or \
                    ('precision' or 'prec') in metric or \
                    ('f1_score' or 'f1') in metric:
-                    warnings.warn(
-                        'Log-cosh loss objective only have loss metric. Ignoring metrics {metric}'.format(metric=metric),
-                        UserWarning)
+                    warnings.warn(f'Log-cosh loss objective only have loss metric. Ignoring metrics {metric}', UserWarning)
             else:
-                raise TypeError('Unknown metric {metric} for objective {name}.'.format(metric=metric, name=self.name))
+                raise TypeError(f'Unknown metric {metric} for objective {self.name}.')
         if shape is not None:
             super().reconfig(shape=shape)
         self.reset()
@@ -626,11 +612,9 @@ class XTanhLoss(Objective):
                    ('recall' or 'rc') in metric or \
                    ('precision' or 'prec') in metric or \
                    ('f1_score' or 'f1') in metric:
-                    warnings.warn(
-                        'XTanh loss objective only have loss metric. Ignoring metrics {metric}'.format(metric=metric),
-                        UserWarning)
+                    warnings.warn(f'XTanh loss objective only have loss metric. Ignoring metrics {metric}', UserWarning)
             else:
-                raise TypeError('Unknown metric {metric} for objective {name}.'.format(metric=metric, name=self.name))
+                raise TypeError(f'Unknown metric {metric} for objective {self.name}.')
         if shape is not None:
             super().reconfig(shape=shape)
         self.reset()
@@ -730,11 +714,9 @@ class XSigmoidLoss(Objective):
                    ('recall' or 'rc') in metric or \
                    ('precision' or 'prec') in metric or \
                    ('f1_score' or 'f1') in metric:
-                    warnings.warn(
-                        'XSigmoid loss objective only have loss metric. Ignoring metrics {metric}'.format(metric=metric),
-                        UserWarning)
+                    warnings.warn(f'XSigmoid loss objective only have loss metric. Ignoring metrics {metric}', UserWarning)
             else:
-                raise TypeError('Unknown metric {metric} for objective {name}.'.format(metric=metric, name=self.name))
+                raise TypeError(f'Unknown metric {metric} for objective {self.name}.')
         if shape is not None:
             super().reconfig(shape=shape)
         self.reset()
@@ -835,11 +817,9 @@ class AlgebraicLoss(Objective):
                    ('recall' or 'rc') in metric or \
                    ('precision' or 'prec') in metric or \
                    ('f1_score' or 'f1') in metric:
-                    warnings.warn(
-                        'Algebraic loss objective only have loss metric. Ignoring metrics {metric}'.format(metric=metric),
-                        UserWarning)
+                    warnings.warn(f'Algebraic loss objective only have loss metric. Ignoring metrics {metric}', UserWarning)
             else:
-                raise TypeError('Unknown metric {metric} for objective {name}.'.format(metric=metric, name=self.name))
+                raise TypeError(f'Unknown metric {metric} for objective {self.name}.')
         if shape is not None:
             super().reconfig(shape=shape)
         self.reset()
@@ -946,7 +926,7 @@ class SigmoidCrossentropyLoss(Objective):
                 if ('f1_score' or 'f1') in metric:
                     self._evaluation['metric']['f1_score'] = 0
             else:
-                raise TypeError('Unknown metric {metric} for objective {name}.'.format(metric=metric, name=self.name))
+                raise TypeError(f'Unknown metric {metric} for objective {self.name}.')
         if shape is not None:
             super().reconfig(shape=shape)
         self.reset()
@@ -1078,7 +1058,7 @@ class SoftmaxCrossentropyLoss(Objective):
                 if ('f1_score' or 'f1') in metric:
                     self._evaluation['metric']['f1_score'] = 0
             else:
-                raise TypeError('Unknown metric {metric} for objective {name}.'.format(metric=metric, name=self.name))
+                raise TypeError(f'Unknown metric {metric} for objective {self.name}.')
         if shape is not None:
             super().reconfig(shape=shape)
         self.reset()

@@ -171,9 +171,7 @@ class Socket(Layer):
         if self.has_next:
             return self.next.forward(stage, self._a_t, residue=residue)
         else:
-            warnings.warn(
-                'Socket {name} connection is incomplete. Missing connection to next layer.'.format(name=self.name),
-                UserWarning)
+            warnings.warn(f'Socket {self.name} connection is incomplete. Missing connection to next layer.', UserWarning)
             return self
 
     @MType(dict, np.ndarray, residue=dict)
@@ -204,9 +202,7 @@ class Socket(Layer):
         if self.has_prev:
             return self.prev.backward(stage, eag_t, residue=residue)
         else:
-            warnings.warn(
-                'Socket {name} connection is incomplete. Missing connection to previous layer.'.format(name=self.name),
-                UserWarning)
+            warnings.warn(f'Socket {self.name} connection is incomplete. Missing connection to previous layer.', UserWarning)
             return self
 
     @abc.abstractmethod
@@ -295,9 +291,7 @@ class Dropout(Socket):
         """
         if pzero is not None:
             if pzero < 0 or pzero >= 1:
-                warnings.warn(
-                    'Dropout probability cannot be < 0 or >= 1. Reset to {pzero}.'.format(pzero=SOCKET.DEFAULT_DROPOUT_PZERO),
-                    UserWarning)
+                warnings.warn(f'Dropout probability cannot be < 0 or >= 1. Reset to {SOCKET.DEFAULT_DROPOUT_PZERO}.', UserWarning)
                 pzero = SOCKET.DEFAULT_DROPOUT_PZERO
             self._pzero = pzero
         if shape is not None:
@@ -367,7 +361,8 @@ class Dropout(Socket):
         pzero = self.compute_pzero(epoch)
         if pzero > 0:
             self._mask_t = self._mask_init((1, self.size), pzero=pzero, dtype=np.int8)
-        a_t = np.multiply(a_t, self._mask_t)
+        if self._mask_t is not None:
+            a_t = np.multiply(a_t, self._mask_t)
         return (a_t, residue)
 
     @MType(dict, np.ndarray, residue=dict)
@@ -496,9 +491,7 @@ class BatchNorm(Socket):
         Set normalizer moving mean vector
         """
         if self.is_frozen:
-            warnings.warn(
-                'Cannot set moving means to a frozen normalizer {name}.'.format(name=self.name),
-                UserWarning)
+            warnings.warn(f'Cannot set moving means to a frozen normalizer {self.name}.', UserWarning)
         else:
             np.copyto(self._moving_mean_v, moving_mean_v, casting='same_kind')
 
@@ -522,9 +515,7 @@ class BatchNorm(Socket):
         Set normalizer moving variance vector
         """
         if self.is_frozen:
-            warnings.warn(
-                'Cannot set moving variances to a frozen normalizer {name}.'.format(name=self.name),
-                UserWarning)
+            warnings.warn(f'Cannot set moving variances to a frozen normalizer {self.name}.', UserWarning)
         else:
             np.copyto(self._moving_variance_v, moving_variance_v, casting='same_kind')
 
@@ -548,9 +539,7 @@ class BatchNorm(Socket):
         Set normalizer gamma vector
         """
         if self.is_frozen:
-            warnings.warn(
-                'Cannot set gammas to a frozen normalizer {name}.'.format(name=self.name),
-                UserWarning)
+            warnings.warn(f'Cannot set gammas to a frozen normalizer {self.name}.', UserWarning)
         else:
             np.copyto(self._gamma_v, gamma_v, casting='same_kind')
 
@@ -574,9 +563,7 @@ class BatchNorm(Socket):
         Set normalizer beta vector
         """
         if self.is_frozen:
-            warnings.warn(
-                'Cannot set betas to a frozen normalizer {name}.'.format(name=self.name),
-                UserWarning)
+            warnings.warn(f'Cannot set betas to a frozen normalizer {self.name}.', UserWarning)
         else:
             np.copyto(self._beta_v, beta_v, casting='same_kind')
 
@@ -663,8 +650,7 @@ class BatchNorm(Socket):
                     elif GlorotRandomUniform.label == moving_mean_init_label:
                         self._moving_mean_init = GlorotRandomUniform()
                     else:
-                        raise TypeError('Unknown moving mean initializer {moving_mean_init_label} for normalizer {name}.'.format(moving_mean_init_label=moving_mean_init_label,
-                                                                                                                                 name=self.name))
+                        raise TypeError(f'Unknown moving mean initializer {moving_mean_init_label} for normalizer {self.name}.')
                     self._moving_mean_v = self._moving_mean_init(self.shape)
             elif isinstance(moving_mean_init, float):
                 self._moving_mean_init = Constant(moving_mean_init)
@@ -698,17 +684,14 @@ class BatchNorm(Socket):
                     elif GlorotRandomUniform.label == moving_variance_init_label:
                         self._moving_variance_init = GlorotRandomUniform()
                     else:
-                        raise TypeError('Unknown moving variance initializer {moving_variance_init_label} for normalizer {name}.'.format(moving_variance_init_label=moving_variance_init_label,
-                                                                                                                                         name=self.name))
+                        raise TypeError(f'Unknown moving variance initializer {moving_variance_init_label} for normalizer {self.name}.')
                     self._moving_variance_v = self._moving_variance_init(self.shape)
             elif isinstance(moving_variance_init, float):
                 self._moving_variance_init = Constant(moving_variance_init)
                 self._moving_variance_v = self._moving_variance_init(self.shape)
             else:
                 if self._moving_variance_init is not None and moving_variance_init.label == self._moving_variance_init.label:
-                    warnings.warn(
-                        'No change made to normalizer moving variance initializer. Re-initializing moving variances skipped.',
-                        UserWarning)
+                    warnings.warn(f'No change made to normalizer moving variance initializer. Re-initializing moving variances skipped.', UserWarning)
                 else:
                     self._moving_variance_init = moving_variance_init
                     self._moving_variance_v = self._moving_variance_init(self.shape)
@@ -716,9 +699,7 @@ class BatchNorm(Socket):
             if isinstance(gamma_init, str):
                 gamma_init_label = gamma_init
                 if self._gamma_init is not None and gamma_init_label == self._gamma_init.label:
-                    warnings.warn(
-                        'No change made to normalizer gamma initializer. Re-initializing gammas skipped.',
-                        UserWarning)
+                    warnings.warn(f'No change made to normalizer gamma initializer. Re-initializing gammas skipped.', UserWarning)
                 else:
                     if Zeros.label == gamma_init_label:
                         self._gamma_init = Zeros()
@@ -733,8 +714,7 @@ class BatchNorm(Socket):
                     elif GlorotRandomUniform.label == gamma_init_label:
                         self._gamma_init = GlorotRandomUniform()
                     else:
-                        raise TypeError('Unknown gamma initializer {gamma_init_label} for normalizer {name}.'.format(gamma_init_label=gamma_init_label,
-                                                                                                                     name=self.name))
+                        raise TypeError(f'Unknown gamma initializer {gamma_init_label} for normalizer {self.name}.')
                     self._gamma_v = self._gamma_init(self.shape)
             elif isinstance(gamma_init, float):
                 self._gamma_init = Constant(gamma_init)
@@ -768,8 +748,7 @@ class BatchNorm(Socket):
                     elif GlorotRandomUniform.label == beta_init_label:
                         self._beta_init = GlorotRandomUniform()
                     else:
-                        raise TypeError('Unknown beta initializer {beta_init_label} for normalizer {name}.'.format(beta_init_label=beta_init_label,
-                                                                                                                   name=self.name))
+                        raise TypeError(f'Unknown beta initializer {beta_init_label} for normalizer {self.name}.')
                     self._beta_v = self._beta_init(self.shape)
             elif isinstance(beta_init, float):
                 self._beta_init = Constant(beta_init)
@@ -799,7 +778,7 @@ class BatchNorm(Socket):
                     elif Adam.label == optim_label:
                         self._optim = Adam()
                     else:
-                        raise TypeError('Unknown optimizer {optim_label} for normalizer {name}.'.format(optim_label=optim_label, name=self.name))
+                        raise TypeError(f'Unknown optimizer {optim_label} for normalizer {self.name}.')
             else:
                 if self._optim is not None and optim.label == self._optim.label:
                     warnings.warn(

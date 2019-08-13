@@ -38,8 +38,8 @@ class REGULARIZER(CONST):
     L2_RIDGE_LABEL = 'l2_ridge'
     L1L2_ELASTIC_NET_LABEL = 'l1l2_elastic_net'
 
-    DEFAULT_L1_LAMBDA = 1e-3
-    DEFAULT_L2_LAMBDA = 1e-3
+    DEFAULT_L1_LAMBDA = 1e-2
+    DEFAULT_L2_LAMBDA = 1e-2
 
 
 # ------------------------------------------------------------------------
@@ -133,7 +133,7 @@ class L1Lasso(Regularizer):
         Arguments:
             epoch:
             w_m: weight matrix
-            hparam: hold eta or learning rate and lambda or regularization rate
+            hparam: hold eta value and lambda or regularization rate
         Returns:
             matrix
         """
@@ -157,7 +157,7 @@ class L2Ridge(Regularizer):
         Arguments:
             epoch:
             w_m: weight matrix
-            hparam: hold eta or learning rate and lambda or regularization rate
+            hparam: hold eta value and lambda or regularization rate
         Returns:
             matrix
         """
@@ -181,7 +181,7 @@ class L1L2ElasticNet(Regularizer):
         Arguments:
             epoch:
             w_m: weight matrix
-            hparam: hold eta or learning rate and lambda or regularization rate
+            hparam: hold eta value and lambda or regularization rate
         Returns:
             matrix
         """

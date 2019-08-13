@@ -232,9 +232,7 @@ class Linear(Gate):
         if self.has_next:
             return self.next.forward(stage, self._a_t, residue=residue)
         else:
-            warnings.warn(
-                'Linear gate {name} connection is incomplete. Missing connection to next layer.'.format(name=self.name),
-                UserWarning)
+            warnings.warn(f'Linear gate {self.name} connection is incomplete. Missing connection to next layer.', UserWarning)
             return self
 
     @MType(dict, np.ndarray, residue=dict)
@@ -250,9 +248,7 @@ class Linear(Gate):
             gate
         """
         if self._a_t is None:
-            warnings.warn(
-                'Linear gate {name} cannot do backward pass. Need to run forward pass first.'.format(name=self.name),
-                UserWarning)
+            warnings.warn(f'Linear gate {self.name} cannot do backward pass. Need to run forward pass first.', UserWarning)
             return self
         else:
             azg_t = Constant(1)(self._z_t.shape, dtype=np.float32)
@@ -335,9 +331,7 @@ class Nonlinear(Gate):
         if self.has_next:
             return self.next.forward(stage, self._a_t, residue=residue)
         else:
-            warnings.warn(
-                'Nonlinear gate {name} connection is incomplete. Missing connection to next layer.'.format(name=self.name),
-                UserWarning)
+            warnings.warn(f'Nonlinear gate {self.name} connection is incomplete. Missing connection to next layer.', UserWarning)
             return self
 
     @MType(dict, np.ndarray, residue=dict)
@@ -353,9 +347,7 @@ class Nonlinear(Gate):
             head
         """
         if self._a_t is None:
-            warnings.warn(
-                'Nonlinear gate {name} cannot do backward pass. Need to run forward pass first.'.format(name=self.name),
-                UserWarning)
+            warnings.warn(f'Nonlinear gate {self.name} cannot do backward pass. Need to run forward pass first.', UserWarning)
             return self
         else:
             azg_t = self.compute_nonlinearity_grad(self._z_t, self._a_t)

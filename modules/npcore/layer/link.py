@@ -176,9 +176,7 @@ class Link(Layer):
         Set link weight matrix.
         """
         if self.is_frozen:
-            warnings.warn(
-                'Cannot set weights to a frozen link {name}.'.format(name=self.name),
-                UserWarning)
+            warnings.warn(f'Cannot set weights to a frozen link {self.name}.', UserWarning)
         else:
             np.copyto(self._w_m, w_m, casting='same_kind')
 
@@ -202,9 +200,7 @@ class Link(Layer):
         Set link bias vector.
         """
         if self.is_frozen:
-            warnings.warn(
-                'Cannot set biases to a frozen link {name}.'.format(name=self.name),
-                UserWarning)
+            warnings.warn(f'Cannot set biases to a frozen link {self.name}.', UserWarning)
         else:
             np.copyto(self._b_v, b_v, casting='same_kind')
 
@@ -250,9 +246,7 @@ class Link(Layer):
             optim:
         """
         if self.is_frozen:
-            warnings.warn(
-                'Link {name} is frozen. Reconfig link skipped.'.format(name=self.name),
-                UserWarning)
+            warnings.warn(f'Link {self.name} is frozen. Reconfig link skipped.', UserWarning)
         else:
             if weight_init is not None:
                 if isinstance(weight_init, str):
@@ -277,7 +271,7 @@ class Link(Layer):
                         elif GlorotRandomUniform.label == weight_init_label:
                             self._weight_init = GlorotRandomUniform()
                         else:
-                            raise TypeError('Unknown weight initializer {weight_init_label} for link {name}.'.format(weight_init_label=weight_init_label, name=self.name))
+                            raise TypeError(f'Unknown weight initializer {weight_init_label} for link {self.name}.')
                         self._w_m = self._weight_init(self.shape)
                 else:
                     if self._weight_init is not None and weight_init.label == self._weight_init.label:
@@ -304,7 +298,7 @@ class Link(Layer):
                         elif L1L2ElasticNet.label == weight_reg_label:
                             self._weight_reg = L1L2ElasticNet()
                         else:
-                            raise TypeError('Unknown weight regularizer {weight_reg_label} for link {name}.'.format(weight_reg_label=weight_reg_label, name=self.name))
+                            raise TypeError(f'Unknown weight regularizer {weight_reg_label} for link {self.name}.')
                 else:
                     if self._weight_reg is not None and weight_reg.label == self._weight_reg.label:
                         warnings.warn(
@@ -327,7 +321,7 @@ class Link(Layer):
                         elif Ones.label == bias_init_label:
                             self._bias_init = Ones()
                         else:
-                            raise TypeError('Unknown bias initializer {bias_init_label} for link {name}.'.format(bias_init_label=bias_init_label, name=self.name))
+                            raise TypeError(f'Unknown bias initializer {bias_init_label} for link {self.name}.')
                         if self._bias_init is not None:
                             self._b_v = self._bias_init((1, self.size))
                         else:
@@ -360,7 +354,7 @@ class Link(Layer):
                         elif Adam.label == optim_label:
                             self._optim = Adam()
                         else:
-                            raise TypeError('Unknown optimizer {optim_label} for link {name}.'.format(optim_label=optim_label, name=self.name))
+                            raise TypeError(f'Unknown optimizer {optim_label} for link {self.name}.')
                 else:
                     if self._optim is not None and optim.label == self._optim.label:
                         warnings.warn(
@@ -457,9 +451,7 @@ class Link(Layer):
 
             return self.next.forward(stage, z_t, residue=residue)
         else:
-            warnings.warn(
-                'Dense link {name} connection is incomplete. Missing connection to next layer.'.format(name=self.name),
-                UserWarning)
+            warnings.warn(f'Dense link {self.name} connection is incomplete. Missing connection to next layer.', UserWarning)
             return self
 
     @MType(dict, np.ndarray, np.ndarray, residue=dict)
@@ -536,7 +528,5 @@ class Link(Layer):
 
             return self.prev.backward(stage, eag_t, residue=residue)
         else:
-            warnings.warn(
-                'Dense link {name} connection is incomplete. Missing connection to previous layer.'.format(name=self.name),
-                UserWarning)
+            warnings.warn(f'Dense link {self.name} connection is incomplete. Missing connection to previous layer.', UserWarning)
             return self

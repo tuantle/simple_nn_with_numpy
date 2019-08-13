@@ -40,8 +40,8 @@ class OPTIMIZER(CONST):
     RMSPROP_LABEL = 'rmsprop'
     ADAM_LABEL = 'adam'
 
-    DEFAULT_ETA = 2e-3
-    DEFAULT_ETA_DECAY = 0.99
+    DEFAULT_ETA = 1e-3
+    DEFAULT_ETA_DECAY = 0.9
     DEFAULT_BETA_DECAY1 = 0.9
     DEFAULT_BETA_DECAY2 = 0.999
     DEFAULT_MOMENTUM = 0.9
@@ -153,7 +153,7 @@ class SGD(Optimizer):
         Arguments:
             epoch:
             egs: a list of gradient error tensors
-            hparam: hold eta or learning rate
+            hparam: hold eta value
         Returns:
             list
         """
@@ -189,7 +189,7 @@ class SGDM(Optimizer):
         Arguments:
             epoch:
             egs: a list of gradient error tensors
-            hparam: hold eta or learning rate
+            hparam: hold eta value
         Returns:
             list
         """
@@ -211,7 +211,7 @@ class SGDM(Optimizer):
 class RMSprop(Optimizer):
     _label = OPTIMIZER.RMSPROP_LABEL
     """
-    RMSprop update rule, which uses a moving average of squared gradient tensors to set adaptive per-parameter learning rates.
+    RMSprop update rule, which uses a moving average of squared gradient tensors to set adaptive per-parameter eta value.
     """
     def __init__(self):
         self._moving_means = []
@@ -233,7 +233,7 @@ class RMSprop(Optimizer):
         Arguments:
             epoch:
             egs: a list of gradient error tensors
-            hparam: hold eta or learning rate
+            hparam: hold eta value
         Returns:
             list
         """
@@ -282,7 +282,7 @@ class Adam(Optimizer):
         Arguments:
             epoch:
             egs: a list of gradient error tensors
-            hparam: hold eta or learning rate
+            hparam: hold eta value
         Returns:
             list
         """

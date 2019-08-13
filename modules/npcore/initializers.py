@@ -570,6 +570,8 @@ class RandomUniform(Initializer):
                  max=INITIALIZER.DEFAULT_RANDOM_UNIFORM_MAX,
                  seed=None):
         self._runiform_t = None
+        if min >= max:
+            warnings.warn(f'Min must be < max. Reset to {INITIALIZER.DEFAULT_RANDOM_UNIFORM_MIN}, {INITIALIZER.DEFAULT_RANDOM_UNIFORM_MAX}.', UserWarning)
         self._min = min
         self._max = max
         if seed is not None and seed < 0:
