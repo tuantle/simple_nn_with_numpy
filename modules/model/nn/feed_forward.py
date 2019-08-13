@@ -283,12 +283,12 @@ class FeedForward(object, metaclass=FeedForward):
         div1 = '====================================================================================\n'
         div2 = '        ----------------------------------------------------------------------------\n'
 
-        summary = '### Feed forward {name} Summary ###\n'.format(name=self.name)
+        summary = f'### Feed forward {self.name} Summary ###\n'
         summary += hdr + div1
 
         if self.is_valid:
             if self.sequence.head.name != '':
-                summary += '{name}:\n'.format(name=self.sequence.head.name)
+                summary += f'{self.sequence.head.name}:\n'
             for layer in self.sequence.head:
                 param_count = 0
                 if isinstance(layer, Nonlinear):
@@ -303,43 +303,38 @@ class FeedForward(object, metaclass=FeedForward):
                     param_count += (layer.shape[0] * layer.shape[1]) + layer.shape[0]
 
                 if isinstance(layer, Link):
-                    link_optim = '{label}'.format(label=layer.optim.label)
+                    link_optim = f'{layer.optim.label}'
                     if layer.is_frozen:
-                        layer_label = '{label} (frozen)'.format(label=layer.label)
+                        layer_label = f'{layer.label} (frozen)'
                     else:
-                        layer_label = '{label}'.format(label=layer.label)
+                        layer_label = f'{layer.label}'
                 elif isinstance(layer, Nonlinear):
                     link_optim = ''
-                    layer_label = '{label}'.format(label=layer.label)
+                    layer_label = f'{layer.label}'
                 else:
                     link_optim = ''
-                    layer_label = '{label}'.format(label=layer.label)
+                    layer_label = f'{layer.label}'
 
                 if isinstance(layer, Link):
                     layer_shape = str(layer.shape)
                 else:
-                    layer_shape = '(*, {size})'.format(size=layer.size)
+                    layer_shape = f'(*, {layer.size})'
 
                 if layer.has_next:
                     summary += div2
-                    summary += '\t{index:<8d}{label1:<8s}{label2:<16s}{shape:<16s}{param_count:<8d}\n'.format(
-                        index=layer.index,
-                        label1=link_optim,
-                        label2=layer_label,
-                        shape=layer_shape,
-                        param_count=param_count)
+                    summary += f'\t{layer.index:<8d}{link_optim:<8s}{layer_label:<16s}{layer_shape:<16s}{param_count:<8d}\n'
                     if layer.next.name != '' and layer.next.name != layer.name and layer.next.has_next:
-                        summary += '{name}:\n'.format(name=layer.next.name)
+                        summary += f'{layer.next.name}:\n'
                 else:
                     summary += div1
                 total_param_count += param_count
 
         if self.is_complete:
-            summary += 'Objective             : {label}\n'.format(label=self.sequence.tail.label)
-        summary += 'Total number of params: {count}\n'.format(count=total_param_count)
-        summary += 'Total number of layers: {count}\n'.format(count=linear_gate_count + nonlinear_gate_count + link_count)
-        summary += '                        {count} nonlinear gate layers\n'.format(count=nonlinear_gate_count)
-        summary += '                        {count} link layers\n'.format(count=link_count)
+            summary += f'Objective             : {self.sequence.tail.label}\n'
+        summary += f'Total number of params: {total_param_count}\n'
+        summary += f'Total number of layers: {linear_gate_count + nonlinear_gate_count + link_count}\n'
+        summary += f'                        {nonlinear_gate_count} nonlinear gate layers\n'
+        summary += f'                        {link_count} link layers\n'
         return summary
 
     @MType(objective=OneOfType(str, Objective),
@@ -362,20 +357,16 @@ class FeedForward(object, metaclass=FeedForward):
             self
         """
         if self.is_complete:
-            warnings.warn(
-                'Feed forward {name} sequence is completed and already setup. Setup skipped.'.format(name=self.name),
-                UserWarning)
+            warnings.warn(f'Feed forward {self.name} sequence is completed and already setup. Setup skipped.', UserWarning)
         else:
             if not self.is_valid:
                 sequencer = self.construct()
                 if not sequencer.is_valid:
-                    raise RuntimeError('Constructed sequence from sequencer {name} is invalid.'.format(name=sequencer.name))
+                    raise RuntimeError(f'Constructed sequence from sequencer {sequencer.name} is invalid.')
                 self._sequencer = sequencer
 
             if 'linear' != self.sequence.tail.label:
-                warnings.warn(
-                    'Output sequence of sequencer {name} is not linear.'.format(name=sequencer.name),
-                    UserWarning)
+                warnings.warn(f'Output sequence of sequencer {sequencer.name} is not linear.', UserWarning)
 
             size = self.sequence.tail.size
             if isinstance(objective, str):
@@ -410,16 +401,14 @@ class FeedForward(object, metaclass=FeedForward):
                                                                        name=name,
                                                                        metric=metric)).lock()
                 else:
-                    raise TypeError('Unknown objective {objective_label} for objective layer.'.format(objective_label=objective_label))
+                    raise TypeError(f'Unknown objective {objective_label} for objective layer.')
             else:
                 if size != objective.size:
                     objective.reconfig(shape=(1, size))
 
                 if metric is not None and metric != tuple(objective.evaluation_metric.keys()):
                     objective.reconfig(metric=metric)
-                    warnings.warn(
-                        'Overiding custom objective layer {name} metric. Using metric {metric}.'.format(name=objective.name, metric=metric),
-                        UserWarning)
+                    warnings.warn(f'Overiding custom objective layer {objective.name} metric. Using metric {metric}.', UserWarning)
 
                 self.sequence.tail.connect(objective).lock()
                 self.sequence.tail.name = self._sequencer.name + objective.name
@@ -442,50 +431,36 @@ class FeedForward(object, metaclass=FeedForward):
             self
         """
         if not self.is_complete:
-            raise RuntimeError('Feed forward {name} sequence is incomplete. Need to complete setup.'.format(name=self.name))
+            raise RuntimeError(f'Feed forward {self.name} sequence is incomplete. Need to complete setup.')
 
         if hparam is not None:
             if 'eta' in hparam:
                 if hparam['eta'] <= 0:
-                    warnings.warn(
-                        'Learning rate eta cannot be <= 0. Reset to {eta}.'.format(eta=OPTIMIZER.DEFAULT_ETA),
-                        UserWarning)
+                    warnings.warn(f'Learning rate eta cannot be <= 0. Reset to {OPTIMIZER.DEFAULT_ETA}.', UserWarning)
                     hparam['eta'] = OPTIMIZER.DEFAULT_ETA
             if 'eta_decay' in hparam:
                 if hparam['eta_decay'] < 0:
-                    warnings.warn(
-                        'Learning rate eta decay cannot be < 0. Reset to {eta_decay}.'.format(eta_decay=OPTIMIZER.DEFAULT_ETA_DECAY),
-                        UserWarning)
+                    warnings.warn(f'Learning rate eta decay cannot be < 0. Reset to {OPTIMIZER.DEFAULT_ETA_DECAY}.', UserWarning)
                     hparam['eta_decay'] = OPTIMIZER.DEFAULT_ETA_DECAY
             if 'beta_decay1' in hparam:
                 if hparam['beta_decay1'] < 0:
-                    warnings.warn(
-                        'Optimization beta decay cannot be < 0. Reset to {beta_decay}.'.format(beta_decay=OPTIMIZER.DEFAULT_BETA_DECAY1),
-                        UserWarning)
+                    warnings.warn(f'Optimization beta decay cannot be < 0. Reset to {OPTIMIZER.DEFAULT_BETA_DECAY1}.', UserWarning)
                     hparam['beta_decay1'] = OPTIMIZER.DEFAULT_BETA_DECAY1
             if 'beta_decay2' in hparam:
                 if hparam['beta_decay2'] < 0:
-                    warnings.warn(
-                        'Optimization beta decay cannot be < 0. Reset to {beta_decay}.'.format(beta_decay=OPTIMIZER.DEFAULT_BETA_DECAY2),
-                        UserWarning)
+                    warnings.warn(f'Optimization beta decay cannot be < 0. Reset to {OPTIMIZER.DEFAULT_BETA_DECAY2}.', UserWarning)
                     hparam['beta_decay2'] = OPTIMIZER.DEFAULT_BETA_DECAY1
             if 'momentum' in hparam:
                 if hparam['momentum'] < 0:
-                    warnings.warn(
-                        'Optimization momentum cannot be < 0. Reset to {momentum}.'.format(momentum=OPTIMIZER.DEFAULT_MOMENTUM),
-                        UserWarning)
+                    warnings.warn(f'Optimization momentum cannot be < 0. Reset to {OPTIMIZER.DEFAULT_MOMENTUM}.', UserWarning)
                     hparam['momentum'] = OPTIMIZER.DEFAULT_MOMENTUM
             if 'l1_lambda' in hparam:
                 if hparam['l1_lambda'] < 0:
-                    warnings.warn(
-                        'Regularization lambda cannot be < 0. Reset to {l_lambda}.'.format(l_lambda=OPTIMIZER.DEFAULT_L1_LAMBDA),
-                        UserWarning)
+                    warnings.warn(f'Regularization lambda cannot be < 0. Reset to {OPTIMIZER.DEFAULT_L1_LAMBDA}.', UserWarning)
                     hparam['l1_lambda'] = OPTIMIZER.DEFAULT_L1_LAMBDA
             if 'l2_lambda' in hparam:
                 if hparam['l2_lambda'] < 0:
-                    warnings.warn(
-                        'Regularization lambda cannot be < 0. Reset to {l_lambda}.'.format(l_lambda=OPTIMIZER.DEFAULT_L2_LAMBDA),
-                        UserWarning)
+                    warnings.warn(f'Regularization lambda cannot be < 0. Reset to {OPTIMIZER.DEFAULT_L2_LAMBDA}.', UserWarning)
                     hparam['l2_lambda'] = OPTIMIZER.DEFAULT_L2_LAMBDA
             self._hparam.update(hparam)
 
@@ -523,13 +498,13 @@ class FeedForward(object, metaclass=FeedForward):
             y_t: output prediction tensor
         """
         if not self.is_complete:
-            raise RuntimeError('Feed forward {name} sequence is incomplete. Need to complete setup.'.format(name=self.name))
+            raise RuntimeError(f'Feed forward {self.name} sequence is incomplete. Need to complete setup.')
         if len(x_t.shape) != 2:
             raise RuntimeError('Input tensor shape size is invalid. Input tensor shape must have a length of 2.')
 
         (input_sample_size, input_feature_size) = x_t.shape
         if input_feature_size != self.sequence.head.size:
-            raise ValueError('Input tensor feature size does not match the size of input layer of {size}.'.format(size=self.sequence.head.size))
+            raise ValueError(f'Input tensor feature size does not match the size of input layer of {self.sequence.head.size}.')
         # x_t = x_t.copy()
         stage = {
             'epoch': 0,
@@ -578,7 +553,7 @@ class FeedForward(object, metaclass=FeedForward):
             verbose:
         """
         if not self.is_complete:
-            raise RuntimeError('Feed forward {name} sequence is incomplete. Need to complete setup.'.format(name=self.name))
+            raise RuntimeError(f'Feed forward {self.name} sequence is incomplete. Need to complete setup.')
         if len(x_t.shape) != 2:
             raise RuntimeError('Input tensor shape size is invalid. Input tensor shape must have a length of 2.')
         elif len(y_prime_t.shape) != 2:
@@ -587,9 +562,9 @@ class FeedForward(object, metaclass=FeedForward):
         (input_sample_size, input_feature_size) = x_t.shape
         (expected_output_sample_size, expected_output_prediction_size) = y_prime_t.shape
         if input_feature_size != self.sequence.head.size:
-            raise ValueError('Input tensor feature size does not match the size of input layer of {size}.'.format(size=self.sequence.head.size))
+            raise ValueError(f'Input tensor feature size does not match the size of input layer of {self.sequence.head.size}.')
         if expected_output_prediction_size != self.sequence.tail.size:
-            raise ValueError('Expected output tensor prediction size does not match the size of output layer of {size}.'.format(size=self.sequence.tail.size))
+            raise ValueError(f'Expected output tensor prediction size does not match the size of output layer of {self.sequence.tail.size}.')
         if expected_output_sample_size != input_sample_size:
             raise ValueError('Input and output tensor sample sizes do not matched.')
         if tl_shuffle:
@@ -624,9 +599,7 @@ class FeedForward(object, metaclass=FeedForward):
 
         if batch_size < 1 or batch_size > learning_sample_size:
             batch_size = learning_sample_size
-            warnings.warn(
-                'Batch size must be >= 1 and <= learning sample size {size}. Set batch size = learning sample size.'.format(size=learning_sample_size),
-                UserWarning)
+            warnings.warn(f'Batch size must be >= 1 and <= learning sample size {learning_sample_size}. Set batch size = learning sample size.', UserWarning)
 
         stop_learning = False
         stage = {
@@ -736,28 +709,23 @@ class FeedForward(object, metaclass=FeedForward):
                 self._monitor(report)
 
             if verbose:
-                print('Epoch: {epoch}/{epoch_limit} - Elapse/Epoch: {elapse_per_epoch} ms - Elapse: {elapse_total} s'.format(epoch=epoch + 1,
-                                                                                                                             epoch_limit=epoch_limit,
-                                                                                                                             elapse_per_epoch=elapse_per_epoch_ms,
-                                                                                                                             elapse_total=round(elapse_total_ms * 1e-3)), end='\n', flush=True)
-                print('\tLearning rate: {eta:.9f}'.format(eta=stage['hparam']['eta']), end='\n', flush=True)
+                learning_rate = stage['hparam']['eta']
+                print(f'Epoch: {epoch + 1}/{epoch_limit} - Elapse/Epoch: {elapse_per_epoch_ms} ms - Elapse: {round(elapse_total_ms * 1e-3)} s', end='\n', flush=True)
+                print(f'\tLearning rate: {learning_rate:.9f}', end='\n', flush=True)
                 if enable_testing:
                     learning_metric_summary = ''
                     testing_metric_summary = ''
                     for (metric_name, metric_value) in learning_evaluation_metric.items():
-                        learning_metric_summary += '{metric_name}: {metric_value:.9f} '.format(metric_name=metric_name,
-                                                                                               metric_value=metric_value)
+                        learning_metric_summary += f'{metric_name}: {metric_value:.9f} '
                     for (metric_name, metric_value) in testing_evaluation_metric.items():
-                        testing_metric_summary += '{metric_name}: {metric_value:.9f} '.format(metric_name=metric_name,
-                                                                                              metric_value=metric_value)
-                    print('\tLearning {metric_summary}'.format(metric_summary=learning_metric_summary), end='\n', flush=True)
-                    print('\tTesting {metric_summary}'.format(metric_summary=testing_metric_summary), end='\n', flush=True)
+                        testing_metric_summary += f'{metric_name}: {metric_value:.9f} '
+                    print(f'\tLearning {learning_metric_summary}', end='\n', flush=True)
+                    print(f'\tTesting {testing_metric_summary}', end='\n', flush=True)
                 else:
                     learning_metric_summary = ''
                     for (metric_name, metric_value) in learning_evaluation_metric.items():
-                        learning_metric_summary += '{metric_name}: {metric_value:.9f} '.format(metric_name=metric_name,
-                                                                                               metric_value=metric_value)
-                    print('\tLearning {metric_summary}'.format(metric_summary=learning_metric_summary), end='\n', flush=True)
+                        learning_metric_summary += f'{metric_name}: {metric_value:.9f} '
+                    print(f'\tLearning {learning_metric_summary}', end='\n', flush=True)
                 if epoch == epoch_limit - 1:
                     print('\n')
             if stop_learning:
@@ -772,7 +740,7 @@ class FeedForward(object, metaclass=FeedForward):
             save_as:
         """
         if not self.is_complete:
-            raise RuntimeError('Feed forward {name} sequence is incomplete. Need to complete setup.'.format(name=self.name))
+            raise RuntimeError(f'Feed forward {self.name} sequence is incomplete. Need to complete setup.')
         if save_as is not None and save_as != '':
             filename = os.path.join(filepath, save_as + '.json')
         else:
@@ -796,7 +764,7 @@ class FeedForward(object, metaclass=FeedForward):
             self
         """
         if self.is_valid and not overwrite:
-            raise RuntimeError('Feed forward {name} sequence is valid. Cannot overwrite sequence.'.format(name=self.name))
+            raise RuntimeError(f'Feed forward {self.name} sequence is valid. Cannot overwrite sequence.')
         with open(filename, 'r') as file:
             model_snapshot = json.load(file)
             hparam = model_snapshot['hparam']
