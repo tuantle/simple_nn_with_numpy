@@ -223,9 +223,9 @@ class Sequencer(object, metaclass=Sequencer):
             self
         """
         if self.is_valid and not overwrite:
-            raise RuntimeError('Sequencer {name} sequence is valid. Cannot overwrite sequence.'.format(name=self.name))
+            raise RuntimeError(f'Sequencer {self.name} sequence is valid. Cannot overwrite sequence.')
         sequence = None
-        for sequence_snapshot in sequencer_snapshot['sequences']:
+        for sequence_snapshot in sequencer_snapshot['sequences'][:-1]:
             layer_label = sequence_snapshot['label']
             name = sequence_snapshot['name']
             shape = tuple(sequence_snapshot['shape'])
@@ -264,7 +264,7 @@ class Sequencer(object, metaclass=Sequencer):
                 elif Adam.label == optim_label:
                     optim = Adam()
                 else:
-                    raise TypeError('Unknown optimizer {optim_label} for normalizer {name}.'.format(optim_label=optim_label, name=name))
+                    raise TypeError(f'Unknown optimizer {optim_label} for normalizer {name}.')
 
                 moving_mean_init = 'zeros'
                 moving_mean_init_label = sequence_snapshot['moving_mean_init']['label']
@@ -281,8 +281,7 @@ class Sequencer(object, metaclass=Sequencer):
                 elif GlorotRandomUniform.label == moving_mean_init_label:
                     moving_mean_init = GlorotRandomUniform()
                 else:
-                    raise TypeError('Unknown moving mean initializer {moving_mean_init_label} for normalizer {name}.'.format(moving_mean_init_label=moving_mean_init_label,
-                                                                                                                             name=name))
+                    raise TypeError(f'Unknown moving mean initializer {moving_mean_init_label} for normalizer {name}.')
                 moving_variance_init = 'ones'
                 moving_variance_init_label = sequence_snapshot['moving_variance_init']['label']
                 if Zeros.label == moving_variance_init_label:
@@ -298,8 +297,7 @@ class Sequencer(object, metaclass=Sequencer):
                 elif GlorotRandomUniform.label == moving_variance_init_label:
                     moving_variance_init = GlorotRandomUniform()
                 else:
-                    raise TypeError('Unknown moving variance initializer {moving_variance_init_label} for normalizer {name}.'.format(moving_variance_init_label=moving_variance_init_label,
-                                                                                                                                     name=name))
+                    raise TypeError(f'Unknown moving variance initializer {moving_variance_init_label} for normalizer {name}.')
 
                 gamma_init = 'ones'
                 gamma_init_label = sequence_snapshot['gamma_init']['label']
@@ -316,8 +314,7 @@ class Sequencer(object, metaclass=Sequencer):
                 elif GlorotRandomUniform.label == gamma_init_label:
                     gamma_init = GlorotRandomUniform()
                 else:
-                    raise TypeError('Unknown gamma initializer {gamma_init_label} for normalizer {name}.'.format(gamma_init_label=gamma_init_label,
-                                                                                                                 name=name))
+                    raise TypeError(f'Unknown gamma initializer {gamma_init_label} for normalizer {name}.')
                 beta_init = 'zeros'
                 beta_init_label = sequence_snapshot['beta_init']['label']
                 if Zeros.label == beta_init_label:
@@ -333,8 +330,7 @@ class Sequencer(object, metaclass=Sequencer):
                 elif GlorotRandomUniform.label == beta_init_label:
                     beta_init = GlorotRandomUniform()
                 else:
-                    raise TypeError('Unknown beta initializer {beta_init_label} for normalizer {name}.'.format(beta_init_label=beta_init_label,
-                                                                                                               name=name))
+                    raise TypeError(f'Unknown beta initializer {beta_init_label} for normalizer {name}.')
                 layer = BatchNorm(size=size,
                                   name=name,
                                   moving_mean_init=moving_mean_init,
@@ -380,7 +376,7 @@ class Sequencer(object, metaclass=Sequencer):
                     seed = sequence_snapshot['weight_init']['seed']
                     weight_init = GlorotRandomUniform(seed=seed)
                 else:
-                    raise TypeError('Unknown weight initializer {weight_init_label} for link {name}.'.format(weight_init_label=weight_init_label, name=name))
+                    raise TypeError(f'Unknown weight initializer {weight_init_label} for link {name}.')
 
                 weight_reg = 'not_use'
                 if sequence_snapshot['weight_reg'] is not None:
@@ -392,13 +388,11 @@ class Sequencer(object, metaclass=Sequencer):
                     elif L1L2ElasticNet.label == weight_reg_label:
                         weight_reg = L1L2ElasticNet()
                     else:
-                        raise TypeError('Unknown weight regularizer {weight_reg_label} for link {name}.'.format(weight_reg_label=weight_reg_label, name=name))
+                        raise TypeError(f'Unknown weight regularizer {weight_reg_label} for link {name}.')
 
                 bias_init = 'not_use'
                 if BatchNorm.label == sequence.tail.label and bias_init != 'not_use':
-                    warnings.warn(
-                        'Link biases is not needed with batch normalization in the previous layer enabled. Link biases initialization skipped.',
-                        UserWarning)
+                    warnings.warn(f'Link biases is not needed with batch normalization in the previous layer enabled. Link biases initialization skipped.', UserWarning)
                 else:
                     if sequence_snapshot['bias_init'] is not None:
                         bias_init_label = sequence_snapshot['bias_init']['label']
@@ -410,7 +404,7 @@ class Sequencer(object, metaclass=Sequencer):
                             value = sequence_snapshot['bias_init']['value']
                             bias_init = Constant(value)
                         else:
-                            raise TypeError('Unknown bias initializer {bias_init_label} for link {name}.'.format(bias_init_label=bias_init_label, name=name))
+                            raise TypeError(f'Unknown bias initializer {bias_init_label} for link {name}.')
 
                 optim = 'sgd'
                 optim_label = sequence_snapshot['optim']['label']
@@ -423,7 +417,7 @@ class Sequencer(object, metaclass=Sequencer):
                 elif Adam.label == optim_label:
                     optim = Adam()
                 else:
-                    raise TypeError('Unknown optimizer {optim_label} for link {name}.'.format(optim_label=optim_label, name=name))
+                    raise TypeError(f'Unknown optimizer {optim_label} for link {name}.')
 
                 layer = Link(shape=shape,
                              name=name,
@@ -495,9 +489,7 @@ class Sequencer(object, metaclass=Sequencer):
                         size = prev_layer_size
                         layer.reconfig(shape=(1, size))
                     else:
-                        warnings.warn(
-                            'Gate layer size is not specified. Using size = 1.',
-                            UserWarning)
+                        warnings.warn('Gate layer size is not specified. Using size = 1.', UserWarning)
                         size = 1
 
                 if Linear.label == layer_label:
@@ -519,7 +511,7 @@ class Sequencer(object, metaclass=Sequencer):
                 elif Algebraic.label == layer_label:
                     layer = Algebraic(size=size, name=name)
                 else:
-                    raise TypeError('Unknown gate layer label {label}.'.format(label=layer_label))
+                    raise TypeError(f'Unknown gate layer label {layer_label}.')
 
                 if preceded_sequencer.is_valid:
                     prev_layer_label = preceded_sequencer.sequence.tail.label
@@ -558,7 +550,7 @@ class Sequencer(object, metaclass=Sequencer):
                     sequence = layer
             elif isinstance(layer, Socket):
                 if not preceded_sequencer.is_valid:
-                    raise RuntimeError('Socket layer {label} cannot be the first layer in sequence'.format(label=layer_label))
+                    raise RuntimeError(f'Socket layer {layer_label} cannot be the first layer in sequence.')
                 if size is None:
                     if preceded_sequencer.is_valid:
                         prev_layer_size = preceded_sequencer.sequence.tail.size
@@ -644,37 +636,29 @@ class Sequencer(object, metaclass=Sequencer):
             self
         """
         if not self.is_valid:
-            raise RuntimeError('Sequencer {name} sequence is valid.'.format(name=self.name))
+            raise RuntimeError(f'Sequencer {self.name} sequence is valid.')
         layer = self.sequence.tail
         if Gate.label in str(layer):
             if layer.has_prev:
                 if weight_init is None and weight_reg is None and \
                    bias_init is None and optim is None:
-                    warnings.warn(
-                        'No reconfiguration was applied to layer {label}'.format(label=layer.label),
-                        UserWarning)
+                    warnings.warn(f'No reconfiguration was applied to layer {layer.label}.', UserWarning)
                 else:
                     layer.prev.reconfig(weight_init=weight_init,
                                         weight_reg=weight_reg,
                                         bias_init=bias_init,
                                         optim=optim)
             else:
-                warnings.warn(
-                    'Reconfiguration was applied. Layer reconfiguration skipped.'.format(label=layer.label),
-                    UserWarning)
+                warnings.warn(f'Reconfiguration was applied. Layer {layer.label} reconfiguration skipped.', UserWarning)
         elif Dropout.label == layer.label:
             if pzero is None:
-                warnings.warn(
-                    'No reconfiguration was applied to layer {label}'.format(label=layer.label),
-                    UserWarning)
+                warnings.warn(f'No reconfiguration was applied to layer {layer.label}.', UserWarning)
             else:
                 layer.reconfig(pzero=pzero)
         elif BatchNorm.label == layer.label:
             if moving_mean_init is None and moving_variance_init is None and \
                gamma_init is None and beta_init is None and optim is None:
-                warnings.warn(
-                    'No reconfiguration was applied to layer {label}'.format(label=layer.label),
-                    UserWarning)
+                warnings.warn(f'No reconfiguration was applied to layer {layer.label}.', UserWarning)
             else:
                 layer.reconfig(moving_mean_init=moving_mean_init,
                                moving_variance_init=moving_variance_init,
@@ -718,7 +702,7 @@ class Sequencer(object, metaclass=Sequencer):
             self
         """
         if not self.is_valid:
-            raise RuntimeError('Sequencer {name} sequence is valid.'.format(name=self.name))
+            raise RuntimeError(f'Sequencer {self.name} sequence is valid.')
         for layer in self.sequence.head:
             if Link.label == layer.label:
                 layer.reconfig(weight_init=weight_init,
